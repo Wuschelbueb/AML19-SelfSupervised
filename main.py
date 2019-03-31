@@ -2,8 +2,13 @@
 import imageRotatorService
 import imageLoader
 import imageRotatorService
+import dataManipulator
 import plotService
 import matplotlib.pyplot as plt
+import torch
+import torchvision
+from torchvision import datasets
+from torchvision import transforms
 
 
 # load all jpgs into a list of numpy arrays
@@ -16,5 +21,8 @@ pics = imageLoader.loadallJPGToNumpy(folderWithJpgs)
 rotImg, rotLabels = imageRotatorService.createRotatedImg(pics)
 
 
-# into pytorch tensor framework
+# Prepare data / crop, move to pytorch tensor and normalise
+imgTensor = dataManipulator.preprocess(rotImg)
 
+
+#
