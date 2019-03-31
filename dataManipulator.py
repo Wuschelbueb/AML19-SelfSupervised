@@ -16,6 +16,7 @@ def preprocess(listOfNPArrayImages):
     for img in listOfNPArrayImages:
         tensorList.append(transformation(img))
 
-    stackedTEnsor = torch.stack(tensorList)
+    stackedTensor = torch.stack(tensorList)
 
-    return stackedTEnsor
+    return stackedTensor
+
