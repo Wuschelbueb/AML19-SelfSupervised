@@ -32,5 +32,5 @@ We'll first test our implementation on the MNIST (https://github.com/zalandorese
 dev-david branch:
 
     -to execute the programm you need to start the main.py file with the following parameters: "--exp=CIFAR10_RotNet_NIN4blocks", "--cuda=True or False"
-    -the fashionmnist dataset needs to be extracted into the data folder.
+    -the fashionmnist dataset needs to be extracted into the ./data folder, e.g.: .data/FashionMNIST
     -on windows i can't get the programm up and running, as soon as i hit the first epoch, i get a pickle error. the source of the error seems to be in the algorithm.py file on line 287. maybe one of you knows a solution?
