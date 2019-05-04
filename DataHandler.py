@@ -1,11 +1,13 @@
 from torch.utils.data import DataLoader, ConcatDataset, random_split
 from torchvision.datasets import FashionMNIST
-from torchvision.transforms import Compose, ToTensor, Normalize
+from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
 from FashionMNISTDataset import FashionMNISTDataset
 from FashionMNISTRotation import FashionMNISTRotation
+from exemplarCNN import ExemplarCNN
 
-transform = Compose([ToTensor(), Normalize(mean=(0.5,), std=(0.5,))])
+target_size = 32
+transform = Compose([Resize(target_size), ToTensor(), Normalize(mean=(0.5,), std=(0.5,))])
 batch_size = 64
 root_dir = 'fashion_mnist'
 
@@ -20,17 +22,12 @@ def test_data():
     return FashionMNIST(root=root_dir, download=True, train=False, transform=transform)
 
 
-def train_data_loader():
-    """Get the train DataLoader"""
-    return DataLoader(train_data(), batch_size=batch_size, shuffle=True)
-
-
-def test_data_loader():
+def test_data_loader_classification():
     """Get the test DataLoader"""
     return DataLoader(test_data(), batch_size=batch_size, shuffle=False)
 
 
-def train_val_dataloader():
+def train_val_dataloader_classification():
     train_subset, val_subset = train_val_subset()
 
     train_set = FashionMNISTDataset(
@@ -49,7 +46,7 @@ def train_val_dataloader():
     return train_loader, val_loader
 
 
-def test_data_rotation_loader():
+def test_data_loader_rotation():
     data_set = test_data()
 
     test_set_0 = FashionMNISTRotation(
@@ -82,7 +79,7 @@ def test_data_rotation_loader():
     return test_loader_rotation
 
 
-def train_data_rotation_loader():
+def train_data_loader_rotation():
     train_sub, _ = train_val_subset()
 
     train_set_0 = FashionMNISTRotation(
@@ -115,7 +112,7 @@ def train_data_rotation_loader():
     return train_loader_rotation
 
 
-def val_data_rotation_loader():
+def val_data_loader_rotation():
     _, val_subset = train_val_subset()
 
     val_set_0 = FashionMNISTRotation(
@@ -146,6 +143,57 @@ def val_data_rotation_loader():
     val_loader_rotation = DataLoader(val_data_rotation, batch_size=batch_size, shuffle=False, num_workers=1)
 
     return val_loader_rotation
+
+
+def train_data_exemplar_cnn():
+    train_subset, val_subset = train_val_subset()
+
+    train_set_exemplar_cnn = ExemplarCNN(
+        data=train_subset,
+        target=train_subset,
+    )
+
+    return train_set_exemplar_cnn
+
+
+def val_data_exemplar_cnn():
+    train_subset, val_subset = train_val_subset()
+
+    val_set_exemplar_cnn = ExemplarCNN(
+        data=val_subset,
+        target=val_subset,
+    )
+
+    return val_set_exemplar_cnn
+
+
+def test_data_exemplar_cnn():
+    data = test_data()
+
+    test_set_exemplar_cnn = ExemplarCNN(
+        data=data,
+        target=data,
+    )
+
+    return test_set_exemplar_cnn
+
+
+def train_data_loader_exemplar_cnn():
+    data = train_data_exemplar_cnn()
+    train_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=True)
+    return train_loader_exemplar_cnn
+
+
+def val_data_loader_exemplar_cnn():
+    data = val_data_exemplar_cnn()
+    val_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=True)
+    return val_loader_exemplar_cnn
+
+
+def test_data_loader_exemplar_cnn():
+    data = test_data_exemplar_cnn()
+    test_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=False)
+    return test_loader_exemplar_cnn
 
 
 def train_val_subset():

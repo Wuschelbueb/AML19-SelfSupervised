@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from train import train
-from DataHandler import train_val_dataloader, train_data_rotation_loader, val_data_rotation_loader
-
+from DataHandler import train_val_dataloader_classification, train_data_loader_rotation, val_data_loader_rotation, \
+    train_data_loader_exemplar_cnn, val_data_loader_exemplar_cnn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -172,8 +172,29 @@ def train_rotation_model(model):
     # Number of epochs
     eps = 10
 
-    train_loader = train_data_rotation_loader()
-    val_loader = val_data_rotation_loader()
+    train_loader = train_data_loader_rotation()
+    val_loader = val_data_loader_rotation()
+    return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
+
+
+def train_exemplar_cnn_model(model):
+    # fitting the convolution to 1 input channel (instead of 3)
+    model.conv = nn.Conv2d(1, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+
+    # Criteria NLLLoss which is recommended with Softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
+
+    # Observe that all parameters are being optimized
+    optim = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    # Decay LR by a factor of 0.1 every 4 epochs
+    sched = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=4, gamma=0.1)
+
+    # Number of epochs
+    eps = 10
+
+    train_loader = train_data_loader_exemplar_cnn()
+    val_loader = val_data_loader_exemplar_cnn()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
 
@@ -208,7 +229,7 @@ def fine_tune_fc(model):
     eps = 10
 
     model = model.to(device)
-    train_loader, val_loader = train_val_dataloader()
+    train_loader, val_loader = train_val_dataloader_classification()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
 
@@ -242,6 +263,6 @@ def fine_tune_variant_2(model):
     eps = 10
 
     model = model.to(device)
-    train_loader, val_loader = train_val_dataloader()
+    train_loader, val_loader = train_val_dataloader_classification()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
