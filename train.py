@@ -15,7 +15,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
     for epoch in range(num_epochs):
         since = time.time()
 
-        print('Epoch {}/{}'.format(epoch + 1, num_epochs))
+        print('Epoch {}/{}\n'.format(epoch + 1, num_epochs))
 
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
@@ -70,7 +70,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
 
     time_elapsed = time.time() - since
 
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
 
     # load best model weights
