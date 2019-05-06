@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from train import train
-from DataHandler import train_val_dataloader_classification, train_data_loader_rotation, val_data_loader_rotation, \
-    train_data_loader_exemplar_cnn, val_data_loader_exemplar_cnn
+from DataHandler import train_loader_classification, val_loader_classification, train_loader_rotation, \
+    val_loader_rotation, train_loader_exemplar_cnn, val_loader_exemplar_cnn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -156,6 +156,10 @@ def ResNet20(**kwargs):
     return ResNet(name='ResNet20', depth=20, num_classes=4, **kwargs)
 
 
+def ResNet20ExemplarCNN(**kwargs):
+    return ResNet(name='ResNet20', depth=20, num_classes=30000, **kwargs)
+
+
 def train_rotation_model(model):
     # fitting the convolution to 1 input channel (instead of 3)
     model.conv = nn.Conv2d(1, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
@@ -172,8 +176,8 @@ def train_rotation_model(model):
     # Number of epochs
     eps = 10
 
-    train_loader = train_data_loader_rotation()
-    val_loader = val_data_loader_rotation()
+    train_loader = train_loader_rotation()
+    val_loader = val_loader_rotation()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
 
@@ -193,8 +197,9 @@ def train_exemplar_cnn_model(model):
     # Number of epochs
     eps = 10
 
-    train_loader = train_data_loader_exemplar_cnn()
-    val_loader = val_data_loader_exemplar_cnn()
+    model = model.to(device)
+    train_loader = train_loader_exemplar_cnn()
+    val_loader = val_loader_exemplar_cnn()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
 
@@ -229,7 +234,8 @@ def fine_tune_fc(model):
     eps = 10
 
     model = model.to(device)
-    train_loader, val_loader = train_val_dataloader_classification()
+    train_loader = train_loader_classification()
+    val_loader = val_loader_classification()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 
 
@@ -263,6 +269,7 @@ def fine_tune_variant_2(model):
     eps = 10
 
     model = model.to(device)
-    train_loader, val_loader = train_val_dataloader_classification()
+    train_loader = train_loader_classification()
+    val_loader = val_loader_classification()
     return train(model, loss_fn, optim, sched, eps, train_loader, val_loader)
 

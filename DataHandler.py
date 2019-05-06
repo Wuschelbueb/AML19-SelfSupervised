@@ -14,73 +14,45 @@ root_dir = 'fashion_mnist'
 
 def train_data():
     """Download and load the training data."""
+    print("Load train data")
     return FashionMNIST(root=root_dir, download=True, train=True, transform=transform)
 
 
 def test_data():
     """Download and load the test data."""
+    print("Load test data")
     return FashionMNIST(root=root_dir, download=True, train=False, transform=transform)
 
 
-def test_data_loader_classification():
-    """Get the test DataLoader"""
-    return DataLoader(test_data(), batch_size=batch_size, shuffle=False)
-
-
-def train_val_dataloader_classification():
-    train_subset, val_subset = train_val_subset()
+def train_loader_classification():
+    train_subset, val_subset = train_val_subset(0.8)
 
     train_set = FashionMNISTDataset(
         data=train_subset,
         targets=train_subset
     )
 
+    return DataLoader(train_set, batch_size=64, shuffle=True)
+
+
+def val_loader_classification():
+    train_subset, val_subset = train_val_subset(0.8)
+
     val_set = FashionMNISTDataset(
         data=val_subset,
         targets=val_subset
     )
 
-    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=64, shuffle=False)
-
-    return train_loader, val_loader
+    return DataLoader(val_set, batch_size=64, shuffle=False)
 
 
-def test_data_loader_rotation():
-    data_set = test_data()
-
-    test_set_0 = FashionMNISTRotation(
-        data=data_set,
-        target=data_set,
-        angle=0
-    )
-
-    test_set_90 = FashionMNISTRotation(
-        data=data_set,
-        target=data_set,
-        angle=90
-    )
-
-    test_set_180 = FashionMNISTRotation(
-        data=data_set,
-        target=data_set,
-        angle=180
-    )
-
-    test_set_270 = FashionMNISTRotation(
-        data=data_set,
-        target=data_set,
-        angle=270
-    )
-
-    test_data_rotation = ConcatDataset([test_set_0, test_set_90, test_set_180, test_set_270])
-    test_loader_rotation = DataLoader(test_data_rotation, batch_size=batch_size, shuffle=False, num_workers=1)
-
-    return test_loader_rotation
+def test_loader_classification():
+    """Get the test DataLoader"""
+    return DataLoader(test_data(), batch_size=batch_size, shuffle=False)
 
 
-def train_data_loader_rotation():
-    train_sub, _ = train_val_subset()
+def train_data_rotation():
+    train_sub, _ = train_val_subset(0.8)
 
     train_set_0 = FashionMNISTRotation(
         data=train_sub,
@@ -107,13 +79,16 @@ def train_data_loader_rotation():
     )
 
     train_data_rotation = ConcatDataset([train_set_0, train_set_90, train_set_180, train_set_270])
-    train_loader_rotation = DataLoader(train_data_rotation, batch_size=batch_size, shuffle=True, num_workers=1)
+    print('Size of train set for rotation: {}'.format(len(train_data_rotation)))
+    return train_data_rotation
 
-    return train_loader_rotation
+
+def train_loader_rotation():
+    return DataLoader(train_data_rotation(), batch_size=batch_size, shuffle=True, num_workers=1)
 
 
-def val_data_loader_rotation():
-    _, val_subset = train_val_subset()
+def val_data_rotation():
+    _, val_subset = train_val_subset(0.8)
 
     val_set_0 = FashionMNISTRotation(
         data=val_subset,
@@ -140,30 +115,71 @@ def val_data_loader_rotation():
     )
 
     val_data_rotation = ConcatDataset([val_set_0, val_set_90, val_set_180, val_set_270])
-    val_loader_rotation = DataLoader(val_data_rotation, batch_size=batch_size, shuffle=False, num_workers=1)
+    print('Size of validation set for rotation: {}'.format(len(val_data_rotation)))
+    return val_data_rotation
 
-    return val_loader_rotation
+
+def val_loader_rotation():
+    return DataLoader(val_data_rotation(), batch_size=batch_size, shuffle=False, num_workers=1)
+
+
+def test_data_rotation():
+    data_set = test_data()
+
+    test_set_0 = FashionMNISTRotation(
+        data=data_set,
+        target=data_set,
+        angle=0
+    )
+
+    test_set_90 = FashionMNISTRotation(
+        data=data_set,
+        target=data_set,
+        angle=90
+    )
+
+    test_set_180 = FashionMNISTRotation(
+        data=data_set,
+        target=data_set,
+        angle=180
+    )
+
+    test_set_270 = FashionMNISTRotation(
+        data=data_set,
+        target=data_set,
+        angle=270
+    )
+
+    test_data_set_rotation = ConcatDataset([test_set_0, test_set_90, test_set_180, test_set_270])
+    print('Size of train set for rotation: {}'.format(len(test_data_set_rotation)))
+    return test_data_set_rotation
+
+
+def test_loader_rotation():
+    return DataLoader(test_data_rotation(), batch_size=batch_size, shuffle=False, num_workers=1)
 
 
 def train_data_exemplar_cnn():
-    train_subset, val_subset = train_val_subset()
+    train_subset, val_subset = train_val_subset(0.5)
 
     train_set_exemplar_cnn = ExemplarCNN(
         data=train_subset,
         target=train_subset,
     )
 
+    print('Size of train set for exemplar cnn: {}'.format(len(train_set_exemplar_cnn)))
     return train_set_exemplar_cnn
 
 
 def val_data_exemplar_cnn():
-    train_subset, val_subset = train_val_subset()
+    train_subset, val_subset = train_val_subset(0.5)
 
     val_set_exemplar_cnn = ExemplarCNN(
         data=val_subset,
         target=val_subset,
     )
 
+    print('Size of validation set for exemplar cnn: {}'.format(len(val_set_exemplar_cnn)))
     return val_set_exemplar_cnn
 
 
@@ -175,31 +191,25 @@ def test_data_exemplar_cnn():
         target=data,
     )
 
+    print('Size of test set for exemplar cnn: {}'.format(len(test_set_exemplar_cnn)))
     return test_set_exemplar_cnn
 
 
-def train_data_loader_exemplar_cnn():
-    data = train_data_exemplar_cnn()
-    train_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=True)
-    return train_loader_exemplar_cnn
+def train_loader_exemplar_cnn():
+    return DataLoader(train_data_exemplar_cnn(), batch_size=64, shuffle=True)
 
 
-def val_data_loader_exemplar_cnn():
-    data = val_data_exemplar_cnn()
-    val_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=True)
-    return val_loader_exemplar_cnn
+def val_loader_exemplar_cnn():
+    return DataLoader(val_data_exemplar_cnn(), batch_size=64, shuffle=False)
 
 
-def test_data_loader_exemplar_cnn():
-    data = test_data_exemplar_cnn()
-    test_loader_exemplar_cnn = DataLoader(data, batch_size=64, shuffle=False)
-    return test_loader_exemplar_cnn
+def test_loader_exemplar_cnn():
+    return DataLoader(test_data_exemplar_cnn(), batch_size=64, shuffle=False)
 
 
-def train_val_subset():
+def train_val_subset(split):
     data_set = train_data()
-    nbr_train_examples = int(len(data_set) * 0.8)
+    nbr_train_examples = int(len(data_set) * split)
     nbr_val_examples = len(data_set) - nbr_train_examples
 
     return random_split(data_set, [nbr_train_examples, nbr_val_examples])
-
