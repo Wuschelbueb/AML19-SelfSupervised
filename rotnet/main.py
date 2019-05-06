@@ -19,7 +19,6 @@ from matplotlib import pyplot as plt
 from random import randint
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(device)
 
 #%%
 # create Dataset for fashion classification (with fashion labels)
@@ -93,10 +92,9 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, trainloader, valload
     best_acc = 0.0
     dataloader = None
     dataset_size = 0
+    since = time.time()
     
     for epoch in range(num_epochs):
-        since = time.time()
-
         print('Epoch {}/{}'.format(epoch+1, num_epochs))
 
         # Each epoch has a training and validation phase
@@ -319,9 +317,6 @@ class ResNet(nn.Module):
 def ResNet20(**kwargs):    
     return ResNet(name = 'ResNet20', depth = 20, num_classes=4,**kwargs)
 
-#%% [markdown]
-# ## Model
-
 #%%
 
 def run():
@@ -490,7 +485,6 @@ def run():
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=1)
 
     resnet20 = ResNet20()
-    resnet20.cuda()
     # fitting the convolution to 1 input channel (instead of 3)
     resnet20.conv = nn.Conv2d(1, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
 
@@ -504,7 +498,9 @@ def run():
     sched = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=4, gamma=0.1)
 
     # Number of epochs
-    eps=5
+    eps=1
+
+    resnet20 = resnet20.to(device)
     resnet20_trained = train(resnet20, loss_fn, optim, sched, eps, train_loader, val_loader)
 
     #Model with freezed layers + classification layer for original dataset
@@ -528,50 +524,33 @@ def run():
 
     # replace fc layer with 10 outputs
     resnet20_trained.fc = nn.Linear(64, 10)
-
-    # Observe that all parameters are being optimized
-    optim = torch.optim.Adam(resnet20_trained.parameters(), lr=0.001)
-
-    # Decay LR by a factor of 0.1 every 4 epochs
-    sched = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=4, gamma=0.1)
-
-    # Number of epochs
-    eps=5
-
+    
     resnet20_trained_classification_1 = train(resnet20_trained, loss_fn, optim, sched, eps, trainloader_classification, valloader_classification)
 
 
-    # # Model with two freezed layers + classification layer for original dataset
-    # # Criteria NLLLoss which is recommended with Softmax final layer
-    # loss_fn = nn.CrossEntropyLoss()
+    # Model with two freezed layers + classification layer for original dataset
+    # Criteria NLLLoss which is recommended with Softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
 
-    # # freeze all layers of the trained model
-    # for param in resnet20_trained.layer1.parameters():
-    #     param.requires_grad = False
+    # freeze all layers of the trained model
+    for param in resnet20_trained.layer1.parameters():
+        param.requires_grad = False
         
-    # for param in resnet20_trained.layer2.parameters():
-    #     param.requires_grad = False    
+    for param in resnet20_trained.layer2.parameters():
+        param.requires_grad = False    
 
-    # for param in resnet20_trained.layer3.parameters():
-    #     param.requires_grad = True
+    for param in resnet20_trained.layer3.parameters():
+        param.requires_grad = True
 
-    # # unfreeze final fc layer
-    # for param in resnet20_trained.fc.parameters():
-    #     param.requires_grad = True
+    # unfreeze final fc layer
+    for param in resnet20_trained.fc.parameters():
+        param.requires_grad = True
 
-    # # replace fc layer with 10 outputs
-    # resnet20_trained.fc = nn.Linear(64, 10)
+    # replace fc layer with 10 outputs
+    resnet20_trained.fc = nn.Linear(64, 10)
 
-    # # Observe that all parameters are being optimized
-    # optim = torch.optim.Adam(resnet20_trained.parameters(), lr=0.001)
-
-    # # Decay LR by a factor of 0.1 every 4 epochs
-    # sched = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=4, gamma=0.1)
-
-    # # Number of epochs
-    # eps=5
-
-    # resnet20_trained_classification_2 = train(resnet20_trained, loss_fn, optim, sched, eps, trainloader_classification, valloader_classification)
+    resnet20_trained_classification_2 = train(resnet20_trained, loss_fn, optim, sched, eps, trainloader_classification, valloader_classification)
+    print('end')
 
 if __name__ == '__main__':
     run()
