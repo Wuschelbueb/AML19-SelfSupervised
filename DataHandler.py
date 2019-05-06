@@ -4,7 +4,7 @@ from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
 from FashionMNISTDataset import FashionMNISTDataset
 from FashionMNISTRotation import FashionMNISTRotation
-from exemplarCNN import ExemplarCNN
+from exemplarCNN import ExemplarCNN, ExemplarCNNVariant2
 
 target_size = 32
 transform = Compose([Resize(target_size), ToTensor(), Normalize(mean=(0.5,), std=(0.5,))])
@@ -205,6 +205,159 @@ def val_loader_exemplar_cnn():
 
 def test_loader_exemplar_cnn():
     return DataLoader(test_data_exemplar_cnn(), batch_size=64, shuffle=False)
+
+
+def train_data_exemplar_cnn_augmented():
+    train_sub, _ = train_val_subset(0.5)
+
+    train_set_horizontal_flip = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=0
+    )
+
+    train_set_random_crop = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=1
+    )
+
+    train_set_color_jitter = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=2
+    )
+
+    train_set_random_resized_crop = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=3
+    )
+
+    train_set_random_rotation = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=4
+    )
+
+    train_set_random_affine_transformation = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=5
+    )
+
+    train_data_set_exemplar_cnn_augmented = ConcatDataset([train_set_horizontal_flip, train_set_random_crop,
+                                                           train_set_color_jitter, train_set_random_resized_crop,
+                                                           train_set_random_rotation,
+                                                           train_set_random_affine_transformation])
+    print('Size of train set for exemplar cnn augmented: {}'.format(len(train_data_set_exemplar_cnn_augmented)))
+    return train_data_set_exemplar_cnn_augmented
+
+
+def train_loader_exemplar_cnn_augmented():
+    return DataLoader(train_data_exemplar_cnn_augmented(), batch_size=batch_size, shuffle=True, num_workers=1)
+
+
+def val_data_exemplar_cnn_augmented():
+    train_sub, val_sub = train_val_subset(0.5)
+
+    val_set_horizontal_flip = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=0
+    )
+
+    val_set_random_crop = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=1
+    )
+
+    val_set_color_jitter = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=2
+    )
+
+    val_set_random_resized_crop = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=3
+    )
+
+    val_set_random_rotation = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=4
+    )
+
+    val_set_random_affine_transformation = ExemplarCNNVariant2(
+        data=train_sub,
+        target=train_sub,
+        transformation=5
+    )
+
+    val_data_set_exemplar_cnn_augmented = ConcatDataset([val_set_horizontal_flip, val_set_random_crop,
+                                                         val_set_color_jitter, val_set_random_resized_crop,
+                                                         val_set_random_rotation,
+                                                         val_set_random_affine_transformation])
+    print('Size of train set for exemplar cnn augmented: {}'.format(len(val_data_set_exemplar_cnn_augmented)))
+    return val_data_set_exemplar_cnn_augmented
+
+
+def val_loader_exemplar_cnn_augmented():
+    return DataLoader(val_data_exemplar_cnn_augmented(), batch_size=batch_size, shuffle=False, num_workers=1)
+
+
+def test_data_exemplar_cnn_augmented():
+    data_set = test_data()
+
+    test_set_horizontal_flip = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=0
+    )
+
+    test_set_random_crop = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=1
+    )
+
+    test_set_color_jitter = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=2
+    )
+
+    test_set_random_resized_crop = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=3
+    )
+
+    test_set_random_rotation = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=4
+    )
+
+    test_set_random_affine_transformation = ExemplarCNNVariant2(
+        data=data_set,
+        target=data_set,
+        transformation=5
+    )
+
+    test_data_set_exemplar_cnn_augmented = ConcatDataset([test_set_horizontal_flip, test_set_random_crop,
+                                                          test_set_color_jitter, test_set_random_resized_crop,
+                                                          test_set_random_rotation,
+                                                          test_set_random_affine_transformation])
+    print('Size of train set for exemplar cnn augmented: {}'.format(len(test_data_set_exemplar_cnn_augmented)))
+    return test_data_set_exemplar_cnn_augmented
+
+
+def test_loader_exemplar_cnn_augmented():
+    return DataLoader(test_data_exemplar_cnn_augmented(), batch_size=batch_size, shuffle=False, num_workers=1)
 
 
 def train_val_subset(split):
