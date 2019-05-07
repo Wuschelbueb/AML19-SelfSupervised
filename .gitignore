@@ -1,3 +1,10 @@
+.DS_Store
+img/
+img.zip
+fashion_mnist/
+processed/
+raw/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -103,4 +110,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+<<<<<<< HEAD
 /data
+=======
+# IDEA
+.idea/
+>>>>>>> dev
