@@ -20,11 +20,46 @@ class ExemplarCNN(Dataset):
         return data, target
 
 
+class ExemplarCNNVariant2(Dataset):
+
+    def __init__(self, data, target, transformation):
+        self.data = data
+        self.target = target
+        self.transformation = transformation
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        data = random_transform(self.data[index][0], self.transformation)
+        target = index
+
+        return data, target, self.transformation
+
+
 def random_transform(image):
     transform = ToPILImage()
     img = transform(image)
 
     transformation = randint(0, 5)
+
+    if transformation == 0:
+        return horizontal_flip(img)
+    if transformation == 1:
+        return random_crop(img)
+    if transformation == 2:
+        return color_jitter(img)
+    if transformation == 3:
+        return random_resized_crop(img)
+    if transformation == 4:
+        return random_rotation(img)
+    if transformation == 5:
+        return random_affine_transformation(img)
+
+
+def random_transform(image, transformation):
+    transform = ToPILImage()
+    img = transform(image)
 
     if transformation == 0:
         return horizontal_flip(img)
@@ -75,7 +110,7 @@ def color_jitter(image):
 
 def random_resized_crop(image):
     transform = Compose([
-        RandomResizedCrop(50, scale=(0.2, 1.0), ratio=(0.75, 1.333)),
+        RandomResizedCrop(40, scale=(0.2, 1.0), ratio=(0.75, 1.333)),
         Resize(32),
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
