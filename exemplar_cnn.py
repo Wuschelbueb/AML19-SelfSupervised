@@ -4,12 +4,12 @@ import time
 import torch
 import torch.nn as nn
 import numpy as np
+from cifar_net import CifarNet
 from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter, \
     RandomResizedCrop, RandomRotation, RandomAffine, Compose, Resize, ToTensor, \
     Normalize, ToPILImage
 from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
     test_loader_classification, train_loader_exemplar_cnn, test_loader_exemplar_cnn
-from resnet import ResNet20ExemplarCNN
 from train import train_and_val
 
 EPOCHS = 15
@@ -129,7 +129,8 @@ def train_exemplar_cnn():
     print("============ Train ExemplarCNN ============")
     print("===========================================\n")
 
-    exemplar_cnn = ResNet20ExemplarCNN()
+    # exemplar_cnn = ResNet20ExemplarCNN()
+    exemplar_cnn = CifarNet(input_channels=1, num_classes=4)
     exemplar_cnn = exemplar_cnn.to(device)
 
     # fitting the convolution to 1 input channel (instead of 3)

@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 
 from train import train_and_val
-from resnet import ResNet20
+from cifar_net import CifarNet
 from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
     test_loader_classification, train_loader_rotation, \
     val_loader_rotation, test_loader_rotation
@@ -26,7 +26,8 @@ def train_rotation_net():
     print("========== Train Rotation Model ===========")
     print("===========================================\n")
 
-    rotation_model = ResNet20()
+    # rotation_model = ResNet20()
+    rotation_model = CifarNet(input_channels=1, num_classes=4)
     rotation_model = rotation_model.to(device)
 
     # fitting the convolution to 1 input channel (instead of 3)
