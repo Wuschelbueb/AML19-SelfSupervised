@@ -3,6 +3,7 @@ from random import randint
 import time
 import torch
 import torch.nn as nn
+import numpy as np
 from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter, \
     RandomResizedCrop, RandomRotation, RandomAffine, Compose, Resize, ToTensor, \
     Normalize, ToPILImage
@@ -184,34 +185,31 @@ def fine_tune_exemplar_cnn(model, unfreeze_l1, unfreeze_l2, unfreeze_l3, unfreez
 
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
     """Train the model"""
+
+    train_losses = []
+    train_accuracies = []
+
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
+
+    since = time.time()
+
     for epoch in range(num_epochs):
-        since = time.time()
-
-        print('Epoch {}/{}\n'.format(epoch + 1, num_epochs))
-
         scheduler.step()
-        model.train(True)  # Set model to training mode
-        dataset_size = len(train_loader.dataset)
+        model.train()
 
-        running_loss = 0.0
-        running_corrects = 0.0
+        running_loss = []
+        running_corrects = 0
 
-        # Iterate over data.
-
-        for data in train_loader:
-            # get the inputs
-            images, labels = data
+        for images, labels in train_loader:
             images = images.to(device)
             labels = labels.to(device)
-
-            # apply random transformation to image, but don't change label
-            transformed_images = transform_images(images)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward
-            outputs = model(transformed_images)
+            outputs = model(images)
             _, preds = torch.max(outputs.data, 1)
             loss = loss_fn(outputs, labels)
 
@@ -220,16 +218,26 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             optimizer.step()
 
             # statistics
-            running_loss += loss.item()
+            running_loss.append(loss.item())
             running_corrects += torch.sum(preds == labels.data).to(torch.float32)
 
-        epoch_loss = running_loss / dataset_size
-        epoch_acc = running_corrects / dataset_size
+        train_losses.append(np.mean(np.array(running_loss)))
+        train_accuracies.append(100.0 * running_corrects / len(train_loader.dataset))
 
-        print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+        # deep copy the model
+        if running_corrects > best_acc:
+            best_acc = running_corrects
+            best_model_wts = model.state_dict()
+
+        print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}'.format(
+            epoch + 1, num_epochs,
+            train_losses[-1],
+            train_accuracies[-1]))
 
     time_elapsed = time.time() - since
+    model.load_state_dict(best_model_wts)  # load best model weights
 
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best val Acc: {:4f}'.format(best_acc))
 
-    return model
+    return model, train_losses, train_accuracies
