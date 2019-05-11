@@ -1,10 +1,11 @@
+"""Train methods."""
 import time
 import torch
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
+def train_and_val(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
     """Train the model"""
 
     best_model_wts = model.state_dict()

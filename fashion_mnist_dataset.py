@@ -1,6 +1,9 @@
+"""Create data set."""
 from torch.utils.data import Dataset
 
+
 class FashionMNISTDataset(Dataset):
+    """Create FashionMNIST data set."""
 
     def __init__(self, data, targets):
         self.data = data

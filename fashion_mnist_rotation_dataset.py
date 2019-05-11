@@ -1,8 +1,10 @@
+"""Create data set."""
 from torch.utils.data import Dataset
 import torchvision.transforms.functional as tf
 
 
-class FashionMNISTRotation(Dataset):
+class FashionMNISTRotationDataset(Dataset):
+    """Create FashionMNIST data set for the rotation task."""
 
     def __init__(self, data, target, angle):
         self.data = data
@@ -28,12 +30,10 @@ class FashionMNISTRotation(Dataset):
         return data, target
 
 
-# Rotate given images by given angle
 def rotate(image, angle):
+    """Rotate the image by the specified angle"""
     image = tf.to_pil_image(image)
-    image = tf.resize(image, 32, interpolation=2)
     image = tf.rotate(image, angle)
     image = tf.to_tensor(image)
-    image = tf.normalize(image, (0.5, ), (0.5, ))
-
+    image = tf.normalize(image, (0.5,), (0.5,))
     return image
