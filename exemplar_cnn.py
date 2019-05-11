@@ -206,11 +206,14 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             images = images.to(device)
             labels = labels.to(device)
 
+            # apply random transformation to image, but don't change label
+            transformed_images = transform_images(images)
+
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward
-            outputs = model(images)
+            outputs = model(transformed_images)
             _, preds = torch.max(outputs.data, 1)
             loss = loss_fn(outputs, labels)
 
