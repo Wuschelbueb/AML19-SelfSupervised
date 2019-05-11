@@ -11,6 +11,7 @@ from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
 from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
     test_loader_classification, train_loader_exemplar_cnn, test_loader_exemplar_cnn
 from train import train_and_val
+from test import test
 
 EPOCHS = 15
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -148,7 +149,7 @@ def train_exemplar_cnn():
     return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn)
 
 
-def fine_tune_exemplar_cnn(model, unfreeze_l1, unfreeze_l2, unfreeze_l3, unfreeze_fc):
+def fine_tune_exemplar_cnn(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
     """Fine tunes the exemplar cnn model."""
     print("===========================================")
     print("========= Fine Tune Exemplar CNN ==========")
@@ -158,20 +159,17 @@ def fine_tune_exemplar_cnn(model, unfreeze_l1, unfreeze_l2, unfreeze_l3, unfreez
     loss_fn = nn.CrossEntropyLoss()
 
     # freezes the layers according to the method parameters
-    for param in model.layer1.parameters():
-        param.requires_grad = unfreeze_l1
+    for param in model.fc1.parameters():
+        param.requires_grad = unfreeze_fc1
 
-    for param in model.layer2.parameters():
-        param.requires_grad = unfreeze_l2
+    for param in model.fc2.parameters():
+        param.requires_grad = unfreeze_fc2
 
-    for param in model.layer3.parameters():
-        param.requires_grad = unfreeze_l3
-
-    for param in model.fc.parameters():
-        param.requires_grad = unfreeze_fc
+    for param in model.fc3.parameters():
+        param.requires_grad = unfreeze_fc3
 
     # replace fc layer with 10 outputs
-    model.fc = nn.Linear(64, 10)
+    model.fc3 = nn.Linear(64, 10)
 
     # Observe that all parameters are being optimized
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -182,6 +180,22 @@ def fine_tune_exemplar_cnn(model, unfreeze_l1, unfreeze_l2, unfreeze_l3, unfreez
     model = model.to(device)
     return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_classification,
                          val_loader_classification)
+
+
+def test_classification_on_exemplar_cnn(model):
+    """Fine tunes the exemplar cnn model."""
+    print("===========================================")
+    print("=== Test Classification on Exemplar CNN ===")
+    print("===========================================\n")
+
+    # Criteria NLLLoss which is recommended with Softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
+
+    # replace fc layer with 10 outputs
+    model.fc3 = nn.Linear(64, 10)
+
+    model = model.to(device)
+    return test(model, loss_fn, EPOCHS, test_loader_classification)
 
 
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
