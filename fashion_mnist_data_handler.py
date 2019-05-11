@@ -84,9 +84,7 @@ def train_data_rotation():
         angle=270
     )
 
-    train_set_rotation = ConcatDataset([train_set_0, train_set_90, train_set_180, train_set_270])
-    print('Size of train set for rotation: {}'.format(len(train_set_rotation)))
-    return train_set_rotation
+    return ConcatDataset([train_set_0, train_set_90, train_set_180, train_set_270])
 
 
 def train_loader_rotation():
@@ -122,9 +120,7 @@ def val_data_rotation():
         angle=270
     )
 
-    val_set_rotation = ConcatDataset([val_set_0, val_set_90, val_set_180, val_set_270])
-    print('Size of validation set for rotation: {}'.format(len(val_set_rotation)))
-    return val_set_rotation
+    return ConcatDataset([val_set_0, val_set_90, val_set_180, val_set_270])
 
 
 def val_loader_rotation():
@@ -160,9 +156,7 @@ def test_data_rotation():
         angle=270
     )
 
-    test_data_set_rotation = ConcatDataset([test_set_0, test_set_90, test_set_180, test_set_270])
-    print('Size of train set for rotation: {}'.format(len(test_data_set_rotation)))
-    return test_data_set_rotation
+    return ConcatDataset([test_set_0, test_set_90, test_set_180, test_set_270])
 
 
 def test_loader_rotation():
@@ -179,7 +173,6 @@ def train_data_exemplar_cnn():
         target=data,
     )
 
-    print('Size of train set for exemplar cnn: {}'.format(len(train_set_exemplar_cnn)))
     return train_set_exemplar_cnn
 
 
@@ -192,7 +185,6 @@ def test_data_exemplar_cnn():
         target=data,
     )
 
-    print('Size of test set for exemplar cnn: {}'.format(len(test_set_exemplar_cnn)))
     return test_set_exemplar_cnn
 
 
