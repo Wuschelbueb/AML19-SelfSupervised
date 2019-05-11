@@ -1,7 +1,10 @@
+"""Creates the data set."""
+
 from torch.utils.data import Dataset
 
-class DeepFashionDataset(Dataset):
 
+class DeepFashionDataset(Dataset):
+    """Creates the DeepFashion data set."""
     def __init__(self, data, target):
         self.data = data
         self.target = target
@@ -10,7 +13,7 @@ class DeepFashionDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        datapoint = self.data[index][0]
+        data = self.data[index][0]
         target = self.target[index]
 
-        return datapoint, target
+        return data, target
