@@ -198,7 +198,7 @@ def test_data_exemplar_cnn():
 
 def train_loader_exemplar_cnn():
     """Creates the data loader for the exemplar cnn train data."""
-    return DataLoader(train_data_exemplar_cnn(), batch_size=64, shuffle=True)
+    return DataLoader(train_data_exemplar_cnn(), batch_size=64, shuffle=False)
 
 
 def test_loader_exemplar_cnn():
