@@ -1,20 +1,21 @@
 import torch
+from CifarNet import CifarNet
 
-from RotationModel import ResNet20, ResNet20ExemplarCNN, train_exemplar_cnn_model, train_rotation_model, fine_tune_fc, \
+
+from RotationModel import ResNet20ExemplarCNN, train_exemplar_cnn_model, train_rotation_model, fine_tune_fc, \
     fine_tune_variant_2
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-resnet20 = ResNet20()
-resnet20 = resnet20.to(device)
+
+cifarModel = CifarNet(inputChannels=1, numClasses=4)
 
 
-pretrain_rot = train_rotation_model(resnet20)
-classification_resnet20 = fine_tune_fc(pretrain_rot)
+pretrain_cifarModel = train_rotation_model(cifarModel)
 
+# pretrain_resnet20 = train_rotation_model(resnet20)
+# classification_resnet20 = fine_tune_fc(pretrain_resnet20)
 
-#resnet_20_exemplar_cnn = ResNet20ExemplarCNN()
-#resnet_20_exemplar_cnn = resnet_20_exemplar_cnn.to(device)
 
 print("Train ResNet20 with ExemplarCNN\n")
 #resnet_20_exemplar_cnn_trained = train_exemplar_cnn_model(resnet_20_exemplar_cnn)

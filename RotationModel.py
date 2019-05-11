@@ -174,7 +174,7 @@ def train_rotation_model(model):
     sched = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=4, gamma=0.1)
 
     # Number of epochs
-    eps = 10
+    eps = 3
 
     train_loader = train_loader_rotation()
     val_loader = val_loader_rotation()
