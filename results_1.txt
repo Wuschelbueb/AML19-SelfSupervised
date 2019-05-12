@@ -1,0 +1,60 @@
+Train ResNet20
+Epoch 1/5
+train Loss: 0.0022 Acc: 0.9509
+val Loss: 0.0012 Acc: 0.9749
+Epoch 2/5
+train Loss: 0.0011 Acc: 0.9771
+val Loss: 0.0009 Acc: 0.9803
+Epoch 3/5
+train Loss: 0.0008 Acc: 0.9825
+val Loss: 0.0006 Acc: 0.9863
+Epoch 4/5
+train Loss: 0.0006 Acc: 0.9855
+val Loss: 0.0005 Acc: 0.9902
+Epoch 5/5
+train Loss: 0.0003 Acc: 0.9938
+val Loss: 0.0002 Acc: 0.9951
+
+Training complete in 3m 23s
+Best val Acc: 0.995125
+
+
+Finetune ResNet20 (only linear layer)
+Epoch 1/5
+train Loss: 0.0217 Acc: 0.5010
+val Loss: 0.0165 Acc: 0.6410
+Epoch 2/5
+train Loss: 0.0154 Acc: 0.6622
+val Loss: 0.0143 Acc: 0.6960
+Epoch 3/5
+train Loss: 0.0138 Acc: 0.7001
+val Loss: 0.0136 Acc: 0.7098
+Epoch 4/5
+train Loss: 0.0129 Acc: 0.7173
+val Loss: 0.0130 Acc: 0.7236
+Epoch 5/5
+train Loss: 0.0124 Acc: 0.7276
+val Loss: 0.0123 Acc: 0.7399
+
+Training complete in 0m 52s
+Best val Acc: 0.739917
+
+
+Finetune ResNet20 (layer 3 + linear layer)
+Epoch 1/5
+train Loss: 0.0072 Acc: 0.8417
+val Loss: 0.0046 Acc: 0.8939
+Epoch 2/5
+train Loss: 0.0043 Acc: 0.8993
+val Loss: 0.0042 Acc: 0.9018
+Epoch 3/5
+train Loss: 0.0036 Acc: 0.9141
+val Loss: 0.0038 Acc: 0.9084
+Epoch 4/5
+train Loss: 0.0032 Acc: 0.9234
+val Loss: 0.0039 Acc: 0.9117
+Epoch 5/5
+train Loss: 0.0024 Acc: 0.9446
+val Loss: 0.0033 Acc: 0.9240
+Training complete in 0m 54s
+Best val Acc: 0.924000
