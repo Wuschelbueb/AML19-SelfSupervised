@@ -13,7 +13,7 @@ def test(model, loss_fn, num_epochs, test_loader):
 
     for epoch in range(num_epochs):
         corrects = 0
-        losses = 0
+        losses = []
 
         with torch.no_grad():
             for images, labels in test_loader:
