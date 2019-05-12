@@ -9,7 +9,7 @@ from fashion_mnist_data_handler import train_loader_classification, val_loader_c
     test_loader_classification, train_loader_rotation, \
     val_loader_rotation, test_loader_rotation
 
-EPOCHS = 3
+EPOCHS = 15
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_classification = train_loader_classification()
