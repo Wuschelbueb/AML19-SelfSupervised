@@ -169,7 +169,7 @@ def fine_tune_exemplar_cnn(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
         param.requires_grad = unfreeze_fc3
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(64, 10)
+    model.fc3 = nn.Linear(192, 10, bias=True)
 
     # Observe that all parameters are being optimized
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -192,7 +192,7 @@ def test_classification_on_exemplar_cnn(model):
     loss_fn = nn.CrossEntropyLoss()
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(64, 10)
+    model.fc3 = nn.Linear(192, 10, bias=True)
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_classification)

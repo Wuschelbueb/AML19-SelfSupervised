@@ -32,7 +32,7 @@ def train_rotation_net():
     rotation_model = rotation_model.to(device)
 
     # fitting the convolution to 1 input channel (instead of 3)
-    rotation_model.conv = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1, bias=False)
+    # rotation_model.conv = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1, bias=False)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -67,7 +67,7 @@ def fine_tune_rotation_model(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
         param.requires_grad = unfreeze_fc3
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(64, 10)
+    model.fc3 = nn.Linear(192, 10, bias=True)
 
     # Observe that all parameters are being optimized
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -90,7 +90,7 @@ def test_classification_on_rotation_model(model):
     loss_fn = nn.CrossEntropyLoss()
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(64, 10)
+    model.fc3 = nn.Linear(192, 10)
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_classification)
