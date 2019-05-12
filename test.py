@@ -13,7 +13,7 @@ def test(model, loss_fn, num_epochs, test_loader):
 
     for epoch in range(num_epochs):
         corrects = 0
-        loss = 0
+        losses = 0
 
         with torch.no_grad():
             for images, labels in test_loader:
@@ -28,10 +28,10 @@ def test(model, loss_fn, num_epochs, test_loader):
                 loss = loss_fn(outputs, labels)
 
                 # statistics
-                loss.append(loss.item())
+                losses.append(loss.item())
                 corrects += torch.sum(preds == labels.data).to(torch.float32)
 
-        test_losses.append(np.mean(np.array(loss)))
+        test_losses.append(np.mean(losses))
         test_accuracies.append(100.0 * corrects / len(test_loader.dataset))
 
         print('Epoch {}/{}: test_loss: {:.4f}, test_accuracy: {:.4f}'.format(
