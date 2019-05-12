@@ -37,5 +37,5 @@ def test(model, loss_fn, num_epochs, test_loader):
         print('Epoch {}/{}: test_loss: {:.4f}, test_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs, test_losses[-1], test_accuracies[-1]))
 
-    # print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(test_losses, test_accuracies))
+    print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(np.mean(test_losses), np.mean(test_accuracies)))
     return test_losses, test_accuracies
