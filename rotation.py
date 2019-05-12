@@ -47,7 +47,7 @@ def train_rotation_net():
                          train_loader_rotation, val_loader_rotation)
 
 
-def fine_tune_rotation_model(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
+def fine_tune_rotation_model(model):
     """Fine tunes the rotation model."""
     print("===========================================")
     print("======== Fine Tune Rotation Model =========")
@@ -56,18 +56,45 @@ def fine_tune_rotation_model(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    # freezes the layers according to the method parameters
-    for param in model.fc1.parameters():
-        param.requires_grad = unfreeze_fc1
+    # freezes all layers except the final one, according to the method parameters
 
-    for param in model.fc2.parameters():
-        param.requires_grad = unfreeze_fc2
+    # for param in model.conv1.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.max1.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.batch1.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.conv2.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.batch2.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.max2.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc1.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.drop.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc2.parameters():
+    #     param.requires_grad = False
+
+    for param in model.parameters():
+        param.requires_grad = False
 
     for param in model.fc3.parameters():
-        param.requires_grad = unfreeze_fc3
+        param.requires_grad = True
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(192, 10, bias=True)
+    model.fc3 = nn.Sequential(nn.Linear(192, 192),
+                              nn.Linear(192, 10, bias=True)
+                              )
 
     # Observe that all parameters are being optimized
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)

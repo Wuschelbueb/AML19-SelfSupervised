@@ -1,4 +1,4 @@
-"""Cifaret model for sub tasks."""
+"""CifarNet model for sub tasks."""
 import torch.nn as nn
 
 

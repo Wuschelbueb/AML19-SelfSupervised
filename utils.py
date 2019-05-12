@@ -22,10 +22,16 @@ def plot_n_curves(values, legend, title="n curves graph", axis1="epochs", axis2=
         axis2= "loss/val"
     )
     """
+
     fig = plt.figure()
 
-    for v in values:
-        plt.plot(np.arange(len(v)), v)
+    if isinstance(values[0], list):
+        # if it is a list of lists
+        for v in values:
+            plt.plot(np.arange(len(v)), v)
+    else:
+        # else it is only one single list
+        plt.plot(np.arange(len(values)), values)
     plt.legend(legend)
     plt.xlabel(axis1)
     plt.ylabel(axis2)

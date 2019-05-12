@@ -14,7 +14,8 @@ from train import train_and_val
 from test import test
 
 EPOCHS = 15
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu' if torch.cuda.is_available() else 'cpu') # TODO: remove this line if another solution has been found
 
 train_loader_classification = train_loader_classification()
 val_loader_classification = val_loader_classification()
@@ -34,7 +35,7 @@ def transform_images(images):
 def random_transform(image):
     """Randomly transforms one image."""
     transform = ToPILImage()
-    img = transform(image)
+    img = transform(image.cpu())
 
     transformation = randint(0, 5)
 
@@ -130,8 +131,8 @@ def train_exemplar_cnn():
     print("============ Train ExemplarCNN ============")
     print("===========================================\n")
 
-    # exemplar_cnn = ResNet20ExemplarCNN()
-    exemplar_cnn = CifarNet(input_channels=1, num_classes=4)
+    # number of predicted classes = number of training images
+    exemplar_cnn = CifarNet(input_channels=1, num_classes=len(train_loader_exemplar_cnn.dataset))
     exemplar_cnn = exemplar_cnn.to(device)
 
     # fitting the convolution to 1 input channel (instead of 3)
@@ -149,7 +150,7 @@ def train_exemplar_cnn():
     return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn)
 
 
-def fine_tune_exemplar_cnn(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
+def fine_tune_exemplar_cnn(model):
     """Fine tunes the exemplar cnn model."""
     print("===========================================")
     print("========= Fine Tune Exemplar CNN ==========")
@@ -158,18 +159,16 @@ def fine_tune_exemplar_cnn(model, unfreeze_fc1, unfreeze_fc2, unfreeze_fc3):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    # freezes the layers according to the method parameters
-    for param in model.fc1.parameters():
-        param.requires_grad = unfreeze_fc1
-
-    for param in model.fc2.parameters():
-        param.requires_grad = unfreeze_fc2
+    for param in model.parameters():
+        param.requires_grad = False
 
     for param in model.fc3.parameters():
-        param.requires_grad = unfreeze_fc3
+        param.requires_grad = True
 
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(192, 10, bias=True)
+    # add fully connected layer and final layer with 10 outputs
+    model.fc3 = nn.Sequential(nn.Linear(192, 192),
+                              nn.Linear(192, 10, bias=True)
+                              )
 
     # Observe that all parameters are being optimized
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -229,6 +228,9 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             # forward
             outputs = model(transformed_images)
             _, preds = torch.max(outputs.data, 1)
+
+            # print("outputs shape", outputs.shape)
+
             loss = loss_fn(outputs, labels)
 
             # backward + optimize only if in training phase
