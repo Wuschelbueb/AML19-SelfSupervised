@@ -16,7 +16,7 @@ plot_n_curves([train_accuracies_rot, val_accuracies_rot], ["train accuracy", "va
 
 # fine tune rotation net
 rotation_finetuned, train_loss_ft_rot, val_loss_ft_rot, train_acc_ft_rot, val_acc_ft_rot = fine_tune_rotation_model(
-    rotation_trained, False, False, True)
+    rotation_trained)
 plot_n_curves([train_loss_ft_rot, val_loss_ft_rot], ["train loss", "val loss"], "Loss for tuning rotation model")
 plot_n_curves([train_acc_ft_rot, val_acc_ft_rot], ["train accuracy", "val accuracy"],
               "Accuracy for fine tuning rotation model")
@@ -37,7 +37,7 @@ plot_n_curves([train_accuracies_ex], ["train accuracy"], "Accuracy for ExemplarC
 
 # fine tune exemplar cnn
 exemplarcnn_finetuned, train_loss_ft_ex, val_loss_ft_ex, train_acc_ft_ex, val_acc_ft_ex = fine_tune_exemplar_cnn(
-    exemplar_cnn_trained, False, False, True)
+    exemplar_cnn_trained)
 plot_n_curves([train_loss_ft_ex, val_loss_ft_ex], ["train loss", "val loss"], "Loss for fine tuning exemplar cnn")
 plot_n_curves([train_acc_ft_ex, val_acc_ft_ex], ["train accuracy", "val accuracy"],
               "Accuracy for fine tuning exemplar cnn")
