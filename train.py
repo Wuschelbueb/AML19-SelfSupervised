@@ -70,9 +70,12 @@ def train_and_val(model, loss_fn, optimizer, scheduler, num_epochs, train_loader
         val_accuracies.append(100.0 * running_corrects_val / len(val_loader.dataset))
 
         # deep copy the model
-        if running_corrects_val > best_acc:
-            best_acc = running_corrects_val
-            best_model_wts = model.state_dict()
+        # if running_corrects_val > best_acc:
+        #     best_acc = running_corrects_val
+        #     best_model_wts = model.state_dict()
+
+        if val_accuracies[-1] > best_acc:
+            best_acc = val_accuracies[-1]
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}, val_loss: {:.4f}, val_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs,
