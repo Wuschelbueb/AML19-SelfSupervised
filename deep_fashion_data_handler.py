@@ -4,9 +4,9 @@ functions like loading the data and the data loader.
 """
 
 import pandas as pd
-from torchvision.transforms import Compose, ToTensor, Normalize, Resize
-from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader, Subset
+from torchvision.datasets import ImageFolder
+from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
 from deep_fashion_dataset import DeepFashionDataset
 
@@ -82,16 +82,16 @@ def test_data():
     return DeepFashionDataset(test_images, test_labels)
 
 
-def train_loader():
+def train_loader_deep_fashion():
     """Return the data loader for the train data."""
     return DataLoader(train_data(), batch_size=64, shuffle=True)
 
 
-def val_loader():
+def val_loader_deep_fashion():
     """Return the data loader for the validation data."""
     return DataLoader(val_data(), batch_size=64, shuffle=False)
 
 
-def test_loader():
+def test_loader_deep_fashion():
     """Return the data loader for the test data."""
     return DataLoader(test_data(), batch_size=64, shuffle=False)

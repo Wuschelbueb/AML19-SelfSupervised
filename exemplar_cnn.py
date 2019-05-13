@@ -1,17 +1,20 @@
 """Contains the code for the exemplar cnn sub task."""
-from random import randint
 import time
+from random import randint
+
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-from cifar_net import CifarNet
 from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter, \
     RandomResizedCrop, RandomRotation, RandomAffine, Compose, Resize, ToTensor, \
     Normalize, ToPILImage
+
+from cifar_net import CifarNet
+from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
     test_loader_classification, train_loader_exemplar_cnn, test_loader_exemplar_cnn
-from train import train_and_val
 from test import test
+from train import train_and_val
 
 EPOCHS = 15
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -24,6 +27,9 @@ test_loader_classification = test_loader_classification()
 train_loader_exemplar_cnn = train_loader_exemplar_cnn()
 test_loader_exemplar_cnn = test_loader_exemplar_cnn()
 
+train_loader_deep_fashion = train_loader_deep_fashion()
+val_loader_deep_fashion = val_loader_deep_fashion()
+test_loader_deep_fashion = test_loader_deep_fashion()
 
 def transform_images(images):
     """Transforms all images of the given batch."""
@@ -181,6 +187,37 @@ def fine_tune_exemplar_cnn(model):
                          val_loader_classification)
 
 
+def fine_tune_exemplar_cnn_deep_fashion(model):
+    """Fine tunes the exemplar cnn model."""
+    print("===========================================")
+    print("========= Fine Tune Exemplar CNN ==========")
+    print("===========================================\n")
+
+    # Criteria NLLLoss which is recommended with Softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
+
+    for param in model.parameters():
+        param.requires_grad = False
+
+    for param in model.fc3.parameters():
+        param.requires_grad = True
+
+    # add fully connected layer and final layer with 10 outputs
+    model.fc3 = nn.Sequential(nn.Linear(192, 192),
+                              nn.Linear(192, 50, bias=True)
+                              )
+
+    # Observe that all parameters are being optimized
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    # Decay LR by a factor of 0.1 every 4 epochs
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+
+    model = model.to(device)
+    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion,
+                         val_loader_deep_fashion)
+
+
 def test_classification_on_exemplar_cnn(model):
     """Fine tunes the exemplar cnn model."""
     print("===========================================")
@@ -191,10 +228,30 @@ def test_classification_on_exemplar_cnn(model):
     loss_fn = nn.CrossEntropyLoss()
 
     # replace fc layer with 10 outputs
-    model.fc3 = nn.Linear(192, 10, bias=True)
+    model.fc3 = nn.Sequential(nn.Linear(192, 192),
+                              nn.Linear(192, 10, bias=True)
+                              )
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_classification)
+
+
+def test_classification_on_exemplar_cnn_deep_fashion(model):
+    """Fine tunes the exemplar cnn model."""
+    print("===========================================")
+    print("=== Test Classification on Exemplar CNN ===")
+    print("===========================================\n")
+
+    # Criteria NLLLoss which is recommended with Softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
+
+    # replace fc layer with 10 outputs
+    model.fc3 = nn.Sequential(nn.Linear(192, 192),
+                              nn.Linear(192, 50, bias=True)
+                              )
+
+    model = model.to(device)
+    return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
 
 
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
