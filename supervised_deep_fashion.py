@@ -63,70 +63,6 @@ def train_supervised_deep_fashion():
                          train_loader_deep_fashion, val_loader_deep_fashion)
 
 
-def fine_tune_supervised_FashionMNIST(model):
-    """Fine tunes the supervised model."""
-    print("=============================================================")
-    print("====== Fine Tune Supervised Model with FashionMNIST =========")
-    print("=============================================================\n")
-
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
-
-    # freezes all layers except the final one, according to the method parameters
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 10, bias=True)
-                              )
-
-    # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
-
-    model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_classification, val_loader_classification)
-
-
-def fine_tune_supervised_deep_fashion(model):
-    """Fine tunes the supervised model."""
-    print("============================================================")
-    print("======== Fine Tune Supervised DeepFashion =========")
-    print("============================================================\n")
-
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 50, bias=True)
-                              )
-
-    # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
-
-    model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_deep_fashion, val_loader_deep_fashion)
-
-
 def test_classification_on_supervised_fashionMNIST(model):
     """Tests the supervised model."""
     print("=============================================================")
@@ -135,11 +71,6 @@ def test_classification_on_supervised_fashionMNIST(model):
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    ##model.fc3 = nn.Sequential(nn.Linear(192, 192),
-     #                         nn.Linear(192, 10, bias=True)
-     #                         )
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_classification)
@@ -153,11 +84,6 @@ def test_classification_deep_fashion(model):
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 50, bias=True)
-                              )
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
