@@ -7,7 +7,7 @@ from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep
 from test import test
 from train import train_and_val
 
-EPOCHS = 1
+EPOCHS = 15
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_classification = train_loader_classification()
