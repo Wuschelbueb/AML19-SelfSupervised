@@ -10,13 +10,14 @@ from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
     Normalize, ToPILImage
 
 from cifar_net import CifarNet
-from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
+from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion, \
+    train_loader_exemplar_cnn_deep_fashion, test_loader_exemplar_cnn_deep_fashion
 from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
     test_loader_classification, train_loader_exemplar_cnn, test_loader_exemplar_cnn
 from test import test
 from train import train_and_val
 
-EPOCHS = 15
+EPOCHS = 1
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device = torch.device('cpu' if torch.cuda.is_available() else 'cpu') # TODO: remove this line if another solution has been found
 
@@ -26,6 +27,9 @@ test_loader_classification = test_loader_classification()
 
 train_loader_exemplar_cnn = train_loader_exemplar_cnn()
 test_loader_exemplar_cnn = test_loader_exemplar_cnn()
+
+train_loader_exemplar_cnn_deep_fashion = train_loader_exemplar_cnn_deep_fashion()
+test_loader_exemplar_cnn_deep_fashion = test_loader_exemplar_cnn_deep_fashion()
 
 train_loader_deep_fashion = train_loader_deep_fashion()
 val_loader_deep_fashion = val_loader_deep_fashion()
@@ -133,16 +137,13 @@ def random_affine_transformation(image):
 
 def train_exemplar_cnn():
     """Trains the exemplar cnn model."""
-    print("===========================================")
-    print("============ Train ExemplarCNN ============")
-    print("===========================================\n")
+    print("=============================================================")
+    print("============ Train ExemplarCNN with FashionMNIST ============")
+    print("=============================================================\n")
 
     # number of predicted classes = number of training images
     exemplar_cnn = CifarNet(input_channels=1, num_classes=len(train_loader_exemplar_cnn.dataset))
     exemplar_cnn = exemplar_cnn.to(device)
-
-    # fitting the convolution to 1 input channel (instead of 3)
-    exemplar_cnn.conv = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1, bias=False)
 
     # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -156,11 +157,33 @@ def train_exemplar_cnn():
     return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn)
 
 
+def train_exemplar_cnn_deep_fashion():
+    """Trains the exemplar cnn model."""
+    print("============================================================")
+    print("============ Train ExemplarCNN with DeepFashion ============")
+    print("============================================================\n")
+
+    # number of predicted classes = number of training images
+    exemplar_cnn = CifarNet(input_channels=3, num_classes=len(train_loader_exemplar_cnn_deep_fashion.dataset))
+    exemplar_cnn = exemplar_cnn.to(device)
+
+    # Criteria NLLLoss which is recommended with softmax final layer
+    loss_fn = nn.CrossEntropyLoss()
+
+    # Observe that all parameters are being optimized
+    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=0.001)
+
+    # Decay LR by a factor of 0.1 every 4 epochs
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+
+    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn_deep_fashion)
+
+
 def fine_tune_exemplar_cnn(model):
     """Fine tunes the exemplar cnn model."""
-    print("===========================================")
-    print("========= Fine Tune Exemplar CNN ==========")
-    print("===========================================\n")
+    print("=============================================================")
+    print("========= Fine Tune Exemplar CNN with FashionMNIST ==========")
+    print("=============================================================\n")
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -189,9 +212,9 @@ def fine_tune_exemplar_cnn(model):
 
 def fine_tune_exemplar_cnn_deep_fashion(model):
     """Fine tunes the exemplar cnn model."""
-    print("===========================================")
-    print("========= Fine Tune Exemplar CNN ==========")
-    print("===========================================\n")
+    print("============================================================")
+    print("========= Fine Tune Exemplar CNN with DeepFashion ==========")
+    print("============================================================\n")
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -220,9 +243,9 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
 
 def test_classification_on_exemplar_cnn(model):
     """Fine tunes the exemplar cnn model."""
-    print("===========================================")
-    print("=== Test Classification on Exemplar CNN ===")
-    print("===========================================\n")
+    print("=============================================================")
+    print("=== Test Classification on Exemplar CNN with FashionMNIST ===")
+    print("=============================================================\n")
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -238,9 +261,9 @@ def test_classification_on_exemplar_cnn(model):
 
 def test_classification_on_exemplar_cnn_deep_fashion(model):
     """Fine tunes the exemplar cnn model."""
-    print("===========================================")
-    print("=== Test Classification on Exemplar CNN ===")
-    print("===========================================\n")
+    print("============================================================")
+    print("=== Test Classification on Exemplar CNN with DeepFashion ===")
+    print("============================================================\n")
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()

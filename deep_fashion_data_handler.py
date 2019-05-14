@@ -4,14 +4,17 @@ functions like loading the data and the data loader.
 """
 
 import pandas as pd
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, Subset, ConcatDataset
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
 from deep_fashion_dataset import DeepFashionDataset
+from exemplar_cnn_dataset import ExemplarCNNDataset
+from rotation_dataset import RotationDataset
 
 ROOT_DIR = 'img/'
 TARGET_SIZE = (32, 32)
+BATCH_SIZE = 64
 
 
 def load_images():
@@ -84,14 +87,156 @@ def test_data():
 
 def train_loader_deep_fashion():
     """Return the data loader for the train data."""
-    return DataLoader(train_data(), batch_size=64, shuffle=True)
+    return DataLoader(train_data(), batch_size=BATCH_SIZE, shuffle=True)
 
 
 def val_loader_deep_fashion():
     """Return the data loader for the validation data."""
-    return DataLoader(val_data(), batch_size=64, shuffle=False)
+    return DataLoader(val_data(), batch_size=BATCH_SIZE, shuffle=False)
 
 
 def test_loader_deep_fashion():
     """Return the data loader for the test data."""
-    return DataLoader(test_data(), batch_size=64, shuffle=False)
+    return DataLoader(test_data(), batch_size=BATCH_SIZE, shuffle=False)
+
+
+def train_data_rotation_deep_fashion():
+    """Creates the train data for the rotation task."""
+    data = train_data()
+
+    train_set_0 = RotationDataset(
+        data=data,
+        target=data,
+        angle=0
+    )
+
+    train_set_90 = RotationDataset(
+        data=data,
+        target=data,
+        angle=90
+    )
+
+    train_set_180 = RotationDataset(
+        data=data,
+        target=data,
+        angle=180
+    )
+
+    train_set_270 = RotationDataset(
+        data=data,
+        target=data,
+        angle=270
+    )
+
+    return ConcatDataset([train_set_0, train_set_90, train_set_180, train_set_270])
+
+
+def train_loader_rotation_deep_fashion():
+    """Creates the data loader for the rotation train data."""
+    return DataLoader(train_data_rotation_deep_fashion(), batch_size=BATCH_SIZE, shuffle=True, num_workers=1)
+
+
+def val_data_rotation_deep_fashion():
+    """Creates the validation data for the rotation task."""
+    data = val_data()
+
+    val_set_0 = RotationDataset(
+        data=data,
+        target=data,
+        angle=0
+    )
+
+    val_set_90 = RotationDataset(
+        data=data,
+        target=data,
+        angle=90
+    )
+
+    val_set_180 = RotationDataset(
+        data=data,
+        target=data,
+        angle=180
+    )
+
+    val_set_270 = RotationDataset(
+        data=data,
+        target=data,
+        angle=270
+    )
+
+    return ConcatDataset([val_set_0, val_set_90, val_set_180, val_set_270])
+
+
+def val_loader_rotation_deep_fashion():
+    """Creates the data loader for the rotation validation data."""
+    return DataLoader(val_data_rotation_deep_fashion(), batch_size=BATCH_SIZE, shuffle=False, num_workers=1)
+
+
+def test_data_rotation_deep_fashion():
+    """Creates the test data for the rotation task."""
+    data = test_data()
+
+    test_set_0 = RotationDataset(
+        data=data,
+        target=data,
+        angle=0
+    )
+
+    test_set_90 = RotationDataset(
+        data=data,
+        target=data,
+        angle=90
+    )
+
+    test_set_180 = RotationDataset(
+        data=data,
+        target=data,
+        angle=180
+    )
+
+    test_set_270 = RotationDataset(
+        data=data,
+        target=data,
+        angle=270
+    )
+
+    return ConcatDataset([test_set_0, test_set_90, test_set_180, test_set_270])
+
+
+def test_loader_rotation_deep_fashion():
+    """Creates the data loader for the rotation test data."""
+    return DataLoader(test_data_rotation_deep_fashion(), batch_size=BATCH_SIZE, shuffle=False, num_workers=1)
+
+
+def train_data_exemplar_cnn_deep_fashion():
+    """Creates the train data for the exemplar cnn task."""
+    data = train_data()
+
+    train_set_exemplar_cnn = ExemplarCNNDataset(
+        data=data,
+        target=data,
+    )
+
+    return train_set_exemplar_cnn
+
+
+def test_data_exemplar_cnn_deep_fashion():
+    """Creates the test data for the rotation task."""
+    data = test_data()
+
+    test_set_exemplar_cnn = ExemplarCNNDataset(
+        data=data,
+        target=data,
+    )
+
+    return test_set_exemplar_cnn
+
+
+def train_loader_exemplar_cnn_deep_fashion():
+    """Creates the data loader for the exemplar cnn train data."""
+    return DataLoader(train_data_exemplar_cnn_deep_fashion(), batch_size=64, shuffle=False)
+
+
+def test_loader_exemplar_cnn_deep_fashion():
+    """Creates the data loader for the exemplar cnn test data."""
+    return DataLoader(test_data_exemplar_cnn_deep_fashion(), batch_size=64, shuffle=False)

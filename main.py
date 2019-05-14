@@ -1,74 +1,81 @@
 """Main"""
 
-from exemplar_cnn import train_exemplar_cnn, fine_tune_exemplar_cnn, fine_tune_exemplar_cnn_deep_fashion, \
+from exemplar_cnn import train_exemplar_cnn, train_exemplar_cnn_deep_fashion, fine_tune_exemplar_cnn, \
+    fine_tune_exemplar_cnn_deep_fashion, \
     test_classification_on_exemplar_cnn, test_classification_on_exemplar_cnn_deep_fashion
-from rotation import train_rotation_net, fine_tune_rotation_model, fine_tune_rotation_model_deep_fashion, \
+from rotation import train_rotation_net, train_rotation_net_deep_fashion, fine_tune_rotation_model, \
+    fine_tune_rotation_model_deep_fashion, \
     test_classification_on_rotation_model, test_classification_on_rotation_model_deep_fashion
 from utils import plot_n_curves
+
+print("====================================")
+print("========== Load the data ===========")
+print("====================================\n")
 
 ################################################
 #               Rotation sub task              #
 ################################################
 
-# train rotation net
-rotation_trained, train_losses_rot, val_losses_rot, train_accuracies_rot, val_accuracies_rot = train_rotation_net()
-plot_n_curves([train_losses_rot, val_losses_rot], ["train loss", "val loss"], "Loss for rotation task")
-plot_n_curves([train_accuracies_rot, val_accuracies_rot], ["train accuracy", "val accuracy"],
-              "Accuracy for rotation task")
+# train rotation net with FashionMNIST
+rot_f_trained, train_losses_rot_f, val_losses_rot_f, train_acc_rot_f, val_acc_rot_f = train_rotation_net()
+plot_n_curves([train_losses_rot_f, val_losses_rot_f], ["rain loss", "val loss"], "Loss rotation FashionMNIST")
+plot_n_curves([train_acc_rot_f, val_acc_rot_f], ["train accuracy", "val accuracy"], "Accuracy rotation FashionMNIST")
 
-# fine tune rotation net with FashionMNIST data
-rotation_finetuned, train_loss_ft_rot, val_loss_ft_rot, train_acc_ft_rot, val_acc_ft_rot = fine_tune_rotation_model(
-    rotation_trained)
-plot_n_curves([train_loss_ft_rot, val_loss_ft_rot], ["train loss", "val loss"], "Loss for tuning rotation model")
-plot_n_curves([train_acc_ft_rot, val_acc_ft_rot], ["train accuracy", "val accuracy"],
-              "Accuracy for fine tuning rotation model")
+# train rotation net with DeepFashion
+rot_df_trained, train_losses_rot_df, val_losses_rot_df, train_acc_rot_df, val_acc_rot_df = train_rotation_net_deep_fashion()
+plot_n_curves([train_losses_rot_df, val_losses_rot_df], ["train loss", "val loss"], "Loss rotation DeepFashion")
+plot_n_curves([train_acc_rot_df, val_acc_rot_df], ["train accuracy", "val accuracy"], "Accuracy rotation DeepFashion")
 
-# fine tune rotation net with DeepFashion data
-rotation_finetuned_deep_fashion, train_loss_ft_rot, val_loss_ft_rot, train_acc_ft_rot, val_acc_ft_rot = fine_tune_rotation_model_deep_fashion(
-    rotation_trained)
-plot_n_curves([train_loss_ft_rot, val_loss_ft_rot], ["train loss", "val loss"], "Loss for tuning rotation model")
-plot_n_curves([train_acc_ft_rot, val_acc_ft_rot], ["train accuracy", "val accuracy"],
-              "Accuracy for fine tuning rotation model")
+# fine tune rotation net with FashionMNIST
+rot_f_finetuned, train_losses_rot_f_ft, val_losses_rot_f_ft, train_acc_rot_f_ft, val_acc_rot_f_ft = fine_tune_rotation_model(rot_f_trained)
+plot_n_curves([train_losses_rot_f_ft, val_losses_rot_f_ft], ["train loss", "val loss"], "Loss fine tune rotation FashionMNIST")
+plot_n_curves([train_acc_rot_f_ft, val_acc_rot_f_ft], ["train accuracy", "val accuracy"], "Accuracy fine tune rotation FashionMNIST")
 
-# test with FashionMNIST data
-test_loss_rot, test_accuracy_rot = test_classification_on_rotation_model(rotation_finetuned)
-plot_n_curves(test_accuracy_rot, "Test accuracy", "FashionMNIST accuracy - pretrained with rotation")
-plot_n_curves(test_loss_rot, "Test loss", "FashionMNIST loss - pretrained with rotation")
+# fine tune rotation net with DeepFashion
+rot_df_finetuned, train_losses_rot_df_ft, val_losses_rot_df_ft, train_acc_rot_df_ft, val_acc_rot_df_ft = fine_tune_rotation_model_deep_fashion(rot_df_trained)
+plot_n_curves([train_losses_rot_df_ft, val_losses_rot_df_ft], ["train loss", "val loss"], "Loss fine tune rotation DeepFashion")
+plot_n_curves([train_acc_rot_df_ft, val_acc_rot_df_ft], ["train accuracy", "val accuracy"], "Accuracy fine tune rotation DeepFashion")
 
-# test with DeepFashion data
-test_loss_rot, test_accuracy_rot = test_classification_on_rotation_model_deep_fashion(rotation_finetuned_deep_fashion)
-plot_n_curves(test_accuracy_rot, "Test accuracy", "DeepFashion accuracy - pretrained with rotation")
-plot_n_curves(test_loss_rot, "Test loss", "DeepFashion loss - pretrained with rotation")
+# test with FashionMNIST
+test_losses_rot_f, test_acc_rot_f = test_classification_on_rotation_model(rot_f_finetuned)
+plot_n_curves(test_losses_rot_f, "Test loss", "Loss test rotation FashionMNIST")
+plot_n_curves(test_acc_rot_f, "Test accuracy", "Accuracy test rotation FashionMNIST")
+
+# test with DeepFashion
+test_losses_rot_df, test_acc_rot_df = test_classification_on_rotation_model_deep_fashion(rot_df_finetuned)
+plot_n_curves(test_losses_rot_df, "Test loss", "Loss test rotation DeepFashion")
+plot_n_curves(test_acc_rot_df, "Test accuracy", "Accuracy test rotation DeepFashion")
 
 ################################################
 #           Exemplar CNN sub task              #
 ################################################
 
-# train exemplar cnn
-exemplar_cnn_trained, train_losses_ex, train_accuracies_ex = train_exemplar_cnn()
-plot_n_curves([train_losses_ex], ["train loss"], "Loss for ExemplarCNN")
-plot_n_curves([train_accuracies_ex], ["train accuracy"], "Accuracy for ExemplarCNN")
+# train exemplar cnn with FashionMNIST
+ex_cnn_f_trained, train_losses_ex_cnn_f, train_acc_ex_cnn_f = train_exemplar_cnn()
+plot_n_curves([train_losses_ex_cnn_f], ["train loss"], "Loss train ExemplarCNN FashionMNIST")
+plot_n_curves([train_acc_ex_cnn_f], ["train accuracy"], "Accuracy train ExemplarCNN FashionMNIST")
+
+# train exemplar cnn with DeepFashion
+ex_cnn_df_trained, train_losses_ex_cnn_df, train_acc_ex_cnn_df = train_exemplar_cnn_deep_fashion()
+plot_n_curves([train_losses_ex_cnn_df], ["train loss"], "Loss train ExemplarCNN DeepFashion")
+plot_n_curves([train_acc_ex_cnn_df], ["train accuracy"], "Accuracy train ExemplarCNN DeepFashion")
 
 # fine tune exemplar cnn with FashionMNIST
-exemplarcnn_finetuned, train_loss_ft_ex, val_loss_ft_ex, train_acc_ft_ex, val_acc_ft_ex = fine_tune_exemplar_cnn(
-    exemplar_cnn_trained)
-plot_n_curves([train_loss_ft_ex, val_loss_ft_ex], ["train loss", "val loss"], "Loss for fine tuning exemplar cnn")
-plot_n_curves([train_acc_ft_ex, val_acc_ft_ex], ["train accuracy", "val accuracy"],
-              "Accuracy for fine tuning exemplar cnn")
+ex_cnn_f_trained_finetuned, train_losses_ex_cnn_f_ft, val_loss_ex_cnn_f_ft, train_acc_ex_cnn_f_ft, val_acc_ex_cnn_f_ft = fine_tune_exemplar_cnn(ex_cnn_f_trained)
+plot_n_curves([train_losses_ex_cnn_f_ft, val_loss_ex_cnn_f_ft], ["train loss", "val loss"], "Loss fine tune ExemplarCNN FashionMNIST")
+plot_n_curves([train_acc_ex_cnn_f_ft, val_acc_ex_cnn_f_ft], ["train accuracy", "val accuracy"], "Accuracy fine tune ExemplarCNN FashionMNIST")
 
 # fine tune exemplar cnn with DeepFashion
-exemplarcnn_finetuned_deep_fashion, train_loss_ft_ex, val_loss_ft_ex, train_acc_ft_ex, val_acc_ft_ex = fine_tune_exemplar_cnn_deep_fashion(
-    exemplar_cnn_trained)
-plot_n_curves([train_loss_ft_ex, val_loss_ft_ex], ["train loss", "val loss"], "Loss for fine tuning exemplar cnn")
-plot_n_curves([train_acc_ft_ex, val_acc_ft_ex], ["train accuracy", "val accuracy"],
-              "Accuracy for fine tuning exemplar cnn")
+ex_cnn_df_trained_finetuned, train_losses_ex_cnn_df_ft, val_loss_ex_cnn_df_ft, train_acc_ex_cnn_df_ft, val_acc_ex_cnn_df_ft = fine_tune_exemplar_cnn_deep_fashion(ex_cnn_df_trained)
+plot_n_curves([train_losses_ex_cnn_df_ft, val_loss_ex_cnn_df_ft], ["train loss", "val loss"], "Loss fine tune ExemplarCNN DeepFashion")
+plot_n_curves([train_acc_ex_cnn_df_ft, val_acc_ex_cnn_df_ft], ["train accuracy", "val accuracy"], "Accuracy fine tune ExemplarCNN DeepFashion")
 
 # test with FashionMNIST
-test_loss_ex, test_accuracy_ex = test_classification_on_exemplar_cnn(exemplarcnn_finetuned)
-plot_n_curves(test_loss_ex, "Test accuracy", "FashionMNIST accuracy - pretrained with exemplar cnn")
-plot_n_curves(test_accuracy_ex, "Test loss", "Test loss", "FashionMNIST loss - pretrained with exemplar cnn")
+test_losses_ex_cnn_f, test_acc_ex_cnn_f = test_classification_on_exemplar_cnn(ex_cnn_f_trained_finetuned)
+plot_n_curves(test_acc_ex_cnn_f, "Test accuracy", "Accuracy test ExemplarCNN FashionMNIST")
+plot_n_curves(test_losses_ex_cnn_f, "Test loss", "Loss test ExemplarCNN FashionMNIST")
 
 # test with DeepFashion
-test_loss_ex, test_accuracy_ex = test_classification_on_exemplar_cnn_deep_fashion(exemplarcnn_finetuned_deep_fashion)
-plot_n_curves(test_accuracy_ex, "Test accuracy", "DeepFashion accuracy - pretrained with exemplar cnn")
-plot_n_curves(test_loss_ex, "Test loss", "Test loss", "DeepFashion loss - pretrained with exemplar cnn")
+test_losses_ex_cnn_df, test_acc_ex_cnn_df = test_classification_on_exemplar_cnn_deep_fashion(ex_cnn_df_trained_finetuned)
+plot_n_curves(test_acc_ex_cnn_df, "Test accuracy", "Loss test ExemplarCNN DeepFashion")
+plot_n_curves(test_losses_ex_cnn_df, "Test loss", "Loss test ExemplarCNN DeepFashion")
