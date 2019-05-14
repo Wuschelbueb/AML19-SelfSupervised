@@ -6,8 +6,8 @@ from exemplar_cnn import train_exemplar_cnn, train_exemplar_cnn_deep_fashion, fi
 from rotation import train_rotation_net, train_rotation_net_deep_fashion, fine_tune_rotation_model, \
     fine_tune_rotation_model_deep_fashion, \
     test_classification_on_rotation_model, test_classification_on_rotation_model_deep_fashion
-from supervised_deep_fashion import train_supervised_deep_fashion, fine_tune_supervised_deep_fashion, test_classification_deep_fashion,\
-    train_supervised_FashionMNIST, fine_tune_supervised_FashionMNIST, test_classification_on_supervised_fashionMNIST
+from supervised_deep_fashion import train_supervised_deep_fashion, test_classification_deep_fashion,\
+    train_supervised_FashionMNIST, test_classification_on_supervised_fashionMNIST
 from utils import plot_n_curves
 
 print("====================================")
