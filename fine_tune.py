@@ -1,13 +1,14 @@
-"""Train methods."""
+"""Fine tune methods."""
 import time
-import torch
+
 import numpy as np
+import torch
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def train_and_val(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
-    """Train the model"""
+def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
+    """Fine tune the model"""
     # We will monitor loss functions as the training progresses
     train_losses = []
     val_losses = []

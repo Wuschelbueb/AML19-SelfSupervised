@@ -1,6 +1,5 @@
 """Contains the code for the exemplar cnn sub task."""
 import time
-from random import randint
 
 import numpy as np
 import torch
@@ -10,44 +9,27 @@ from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
     Normalize, ToPILImage
 
 from cifar_net import CifarNet
-from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion, \
-    train_loader_exemplar_cnn_deep_fashion, test_loader_exemplar_cnn_deep_fashion
-from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
-    test_loader_classification, train_loader_exemplar_cnn, test_loader_exemplar_cnn
+from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
+from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
+from fine_tune import fine_tune
 from test import test
-from train import train_and_val
 
 EPOCHS = 1
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu' if torch.cuda.is_available() else 'cpu') # TODO: remove this line if another solution has been found
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-train_loader_classification = train_loader_classification()
-val_loader_classification = val_loader_classification()
-test_loader_classification = test_loader_classification()
-
-train_loader_exemplar_cnn = train_loader_exemplar_cnn()
-test_loader_exemplar_cnn = test_loader_exemplar_cnn()
-
-train_loader_exemplar_cnn_deep_fashion = train_loader_exemplar_cnn_deep_fashion()
-test_loader_exemplar_cnn_deep_fashion = test_loader_exemplar_cnn_deep_fashion()
+train_loader_fashion_mnist = train_loader_fashion_mnist()
+val_loader_fashion_mnist = val_loader_fashion_mnist()
+test_loader_fashion_mnist = test_loader_fashion_mnist()
 
 train_loader_deep_fashion = train_loader_deep_fashion()
 val_loader_deep_fashion = val_loader_deep_fashion()
 test_loader_deep_fashion = test_loader_deep_fashion()
 
-def transform_images(images):
-    """Transforms all images of the given batch."""
-    for index, img in enumerate(images):
-        images[index] = random_transform(img)
-    return images
 
-
-def random_transform(image):
+def transform_image(image, transformation):
     """Randomly transforms one image."""
     transform = ToPILImage()
     img = transform(image.cpu())
-
-    transformation = randint(0, 5)
 
     if transformation == 0:
         return horizontal_flip(img)
@@ -142,7 +124,7 @@ def train_exemplar_cnn():
     print("=============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=1, num_classes=len(train_loader_exemplar_cnn.dataset))
+    exemplar_cnn = CifarNet(input_channels=1, num_classes=train_loader_fashion_mnist.batch_size)
     exemplar_cnn = exemplar_cnn.to(device)
 
     # Criteria NLLLoss which is recommended with softmax final layer
@@ -154,7 +136,7 @@ def train_exemplar_cnn():
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn)
+    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist)
 
 
 def train_exemplar_cnn_deep_fashion():
@@ -164,7 +146,7 @@ def train_exemplar_cnn_deep_fashion():
     print("============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=3, num_classes=len(train_loader_exemplar_cnn_deep_fashion.dataset))
+    exemplar_cnn = CifarNet(input_channels=3, num_classes=train_loader_deep_fashion.batch_size)
     exemplar_cnn = exemplar_cnn.to(device)
 
     # Criteria NLLLoss which is recommended with softmax final layer
@@ -176,7 +158,7 @@ def train_exemplar_cnn_deep_fashion():
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_exemplar_cnn_deep_fashion)
+    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
 
 
 def fine_tune_exemplar_cnn(model):
@@ -206,8 +188,7 @@ def fine_tune_exemplar_cnn(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
     model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_classification,
-                         val_loader_classification)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
 def fine_tune_exemplar_cnn_deep_fashion(model):
@@ -237,8 +218,7 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
     model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion,
-                         val_loader_deep_fashion)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
 def test_classification_on_exemplar_cnn(model):
@@ -256,7 +236,7 @@ def test_classification_on_exemplar_cnn(model):
                               )
 
     model = model.to(device)
-    return test(model, loss_fn, EPOCHS, test_loader_classification)
+    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
 def test_classification_on_exemplar_cnn_deep_fashion(model):
@@ -299,14 +279,32 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             images = images.to(device)
             labels = labels.to(device)
 
-            # apply random transformation to image, but don't change label
-            transformed_images = transform_images(images)
+            images_transformed = []
+            labes_transformed = []
+
+            for index, img in enumerate(images):
+                transformed_imgs = [
+                    transform_image(img, 0),
+                    transform_image(img, 1),
+                    transform_image(img, 2),
+                    transform_image(img, 3),
+                    transform_image(img, 4),
+                    transform_image(img, 5),
+                ]
+                transformed_labels = torch.LongTensor([index, index, index, index, index, index])
+                stack = torch.stack(transformed_imgs, dim=0)
+
+                images_transformed.append(stack)
+                labes_transformed.append(transformed_labels)
+
+            images = torch.cat(images_transformed, dim=0)
+            labels = torch.cat(labes_transformed, dim=0)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward
-            outputs = model(transformed_images)
+            outputs = model(images)
             _, preds = torch.max(outputs.data, 1)
 
             # print("outputs shape", outputs.shape)

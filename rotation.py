@@ -1,35 +1,37 @@
 """Handles the rotation sub task."""
+
+import time
+
+import numpy as np
 import torch
 import torch.nn as nn
+import torchvision.transforms.functional as tf
 
 from cifar_net import CifarNet
-from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion, \
-    train_loader_rotation_deep_fashion, val_loader_rotation_deep_fashion, test_loader_rotation_deep_fashion
-from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, \
-    test_loader_classification, train_loader_rotation, \
-    val_loader_rotation, test_loader_rotation
+from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
+from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
+from fine_tune import fine_tune
 from test import test
-from train import train_and_val
 
 EPOCHS = 1
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-train_loader_classification = train_loader_classification()
-val_loader_classification = val_loader_classification()
-test_loader_classification = test_loader_classification()
-
-train_loader_rotation = train_loader_rotation()
-val_loader_rotation = val_loader_rotation()
-test_loader_rotation = test_loader_rotation()
-
-train_loader_rotation_deep_fashion = train_loader_rotation_deep_fashion()
-val_loader_rotation_deep_fashion = val_loader_rotation_deep_fashion()
-test_loader_rotation_deep_fashion = test_loader_rotation_deep_fashion()
-
+train_loader_fashion_mnist = train_loader_fashion_mnist()
+val_loader_fashion_mnist = val_loader_fashion_mnist()
+test_loader_fashion_mnist = test_loader_fashion_mnist()
 
 train_loader_deep_fashion = train_loader_deep_fashion()
 val_loader_deep_fashion = val_loader_deep_fashion()
 test_loader_deep_fashion = test_loader_deep_fashion()
+
+
+def rotate(image, angle):
+    """Rotate the image by the specified angle"""
+    image = tf.to_pil_image(image)
+    image = tf.rotate(image, angle)
+    image = tf.to_tensor(image)
+    image = tf.normalize(image, (0.5,), (0.5,))
+    return image
 
 
 def train_rotation_net():
@@ -38,20 +40,19 @@ def train_rotation_net():
     print("========== Train Rotation Model with FashionMNIST ===========")
     print("=============================================================\n")
 
-    rotation_model = CifarNet(input_channels=1, num_classes=4)
-    rotation_model = rotation_model.to(device)
+    model = CifarNet(input_channels=1, num_classes=4)
+    model = model.to(device)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(rotation_model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train_and_val(rotation_model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_rotation, val_loader_rotation)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
 def train_rotation_net_deep_fashion():
@@ -60,20 +61,19 @@ def train_rotation_net_deep_fashion():
     print("========== Train Rotation Model with DeepFashion ===========")
     print("============================================================\n")
 
-    rotation_model = CifarNet(input_channels=3, num_classes=4)
-    rotation_model = rotation_model.to(device)
+    model = CifarNet(input_channels=3, num_classes=4)
+    model = model.to(device)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(rotation_model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train_and_val(rotation_model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_rotation_deep_fashion, val_loader_rotation_deep_fashion)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
 def fine_tune_rotation_model(model):
@@ -86,34 +86,6 @@ def fine_tune_rotation_model(model):
     loss_fn = nn.CrossEntropyLoss()
 
     # freezes all layers except the final one, according to the method parameters
-
-    # for param in model.conv1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.max1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.batch1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.conv2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.batch2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.max2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.fc1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.drop.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.fc2.parameters():
-    #     param.requires_grad = False
-
     for param in model.parameters():
         param.requires_grad = False
 
@@ -132,8 +104,7 @@ def fine_tune_rotation_model(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
     model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_classification, val_loader_classification)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
 def fine_tune_rotation_model_deep_fashion(model):
@@ -151,7 +122,7 @@ def fine_tune_rotation_model_deep_fashion(model):
     for param in model.fc3.parameters():
         param.requires_grad = True
 
-    # replace fc layer with 10 outputs
+    # replace fc layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 50, bias=True)
                               )
@@ -163,8 +134,7 @@ def fine_tune_rotation_model_deep_fashion(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
     model = model.to(device)
-    return train_and_val(model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_deep_fashion, val_loader_deep_fashion)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
 def test_classification_on_rotation_model(model):
@@ -182,7 +152,7 @@ def test_classification_on_rotation_model(model):
                               )
 
     model = model.to(device)
-    return test(model, loss_fn, EPOCHS, test_loader_classification)
+    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
 def test_classification_on_rotation_model_deep_fashion(model):
@@ -194,10 +164,130 @@ def test_classification_on_rotation_model_deep_fashion(model):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    # replace fc layer with 10 outputs
+    # replace fc layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 50, bias=True)
                               )
 
     model = model.to(device)
     return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
+
+
+def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
+    """Train the model"""
+    # We will monitor loss functions as the training progresses
+    train_losses = []
+    val_losses = []
+    train_accuracies = []
+    val_accuracies = []
+
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
+
+    since = time.time()
+
+    for epoch in range(num_epochs):
+        scheduler.step()
+        model.train()
+
+        running_loss = []
+        running_corrects_train = 0.0
+
+        for images, labels in train_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+
+            images_rotated = []
+            labes_rotated = []
+
+            for img in images:
+                rotated_imgs = [
+                    img,
+                    rotate(img, 90),
+                    rotate(img, 180),
+                    rotate(img, 270)
+                ]
+                rotation_labels = torch.LongTensor([0, 1, 2, 3])
+                stack = torch.stack(rotated_imgs, dim=0)
+
+                images_rotated.append(stack)
+                labes_rotated.append(rotation_labels)
+
+            images = torch.cat(images_rotated, dim=0)
+            labels = torch.cat(labes_rotated, dim=0)
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward
+            outputs = model(images)
+            _, preds = torch.max(outputs.data, 1)
+            loss = loss_fn(outputs, labels)
+
+            # backward + optimize only if in training phase
+            loss.backward()
+            optimizer.step()
+
+            # statistics
+            running_loss.append(loss.item())
+            running_corrects_train += torch.sum(preds == labels.data).to(torch.float32)
+
+        train_losses.append(np.mean(np.array(running_loss)))
+        train_accuracies.append(100.0 * running_corrects_train / len(train_loader.dataset))
+
+        model.eval()
+        running_corrects_val = 0.0
+        running_loss = []
+        with torch.no_grad():
+            for images, labels in val_loader:
+                images = images.to(device)
+                labels = labels.to(device)
+
+                images_rotated = []
+                labes_rotated = []
+
+                for img in images:
+                    rotated_imgs = [
+                        img,
+                        rotate(img, 90),
+                        rotate(img, 180),
+                        rotate(img, 270)
+                    ]
+                    rotation_labels = torch.LongTensor([0, 1, 2, 3])
+                    cat = torch.cat(rotated_imgs, dim=0)
+
+                    images_rotated.append(cat)
+                    labes_rotated.append(rotation_labels)
+
+                images = torch.cat(images_rotated, dim=0).unsqueeze(1)
+                labels = torch.cat(labes_rotated, dim=0)
+
+                # forward
+                outputs = model(images)
+                _, preds = torch.max(outputs.data, 1)
+                loss = loss_fn(outputs, labels)
+
+                # statistics
+                running_loss.append(loss.item())
+                running_corrects_val += torch.sum(preds == labels.data).to(torch.float32)
+
+        val_losses.append(np.mean(np.array(running_loss)))
+        val_accuracies.append(100.0 * running_corrects_val / len(val_loader.dataset))
+
+        if val_accuracies[-1] > best_acc:
+            best_acc = val_accuracies[-1]
+
+        print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}, val_loss: {:.4f}, val_accuracy: {:.4f}'.format(
+            epoch + 1, num_epochs,
+            train_losses[-1],
+            train_accuracies[-1],
+            val_losses[-1],
+            val_accuracies[-1]))
+
+    time_elapsed = time.time() - since
+    model.load_state_dict(best_model_wts)  # load best model weights
+
+    print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best val Acc: {:4f}'.format(best_acc))
+
+    return model, train_losses, val_losses, train_accuracies, val_accuracies
