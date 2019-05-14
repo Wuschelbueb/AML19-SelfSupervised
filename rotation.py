@@ -87,33 +87,6 @@ def fine_tune_rotation_model(model):
 
     # freezes all layers except the final one, according to the method parameters
 
-    # for param in model.conv1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.max1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.batch1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.conv2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.batch2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.max2.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.fc1.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.drop.parameters():
-    #     param.requires_grad = False
-    #
-    # for param in model.fc2.parameters():
-    #     param.requires_grad = False
-
     for param in model.parameters():
         param.requires_grad = False
 
