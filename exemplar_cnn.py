@@ -17,7 +17,7 @@ from fashion_mnist_data_handler import train_loader_classification, val_loader_c
 from test import test
 from train import train_and_val
 
-EPOCHS = 1
+EPOCHS = 15
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device = torch.device('cpu' if torch.cuda.is_available() else 'cpu') # TODO: remove this line if another solution has been found
 
