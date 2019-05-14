@@ -86,6 +86,7 @@ def fine_tune_rotation_model(model):
     loss_fn = nn.CrossEntropyLoss()
 
     # freezes all layers except the final one, according to the method parameters
+
     for param in model.parameters():
         param.requires_grad = False
 
@@ -138,7 +139,7 @@ def fine_tune_rotation_model_deep_fashion(model):
 
 
 def test_classification_on_rotation_model(model):
-    """Fine tunes the rotation model."""
+    """Tests the rotation model."""
     print("=============================================================")
     print("== Test Classification on Rotation Model with FashionMNIST ==")
     print("=============================================================\n")
@@ -156,7 +157,7 @@ def test_classification_on_rotation_model(model):
 
 
 def test_classification_on_rotation_model_deep_fashion(model):
-    """Fine tunes the rotation model."""
+    """Tests the rotation model."""
     print("============================================================")
     print("== Test Classification on Rotation Model with DeepFashion ==")
     print("============================================================\n")

@@ -6,6 +6,8 @@ from exemplar_cnn import train_exemplar_cnn, train_exemplar_cnn_deep_fashion, fi
 from rotation import train_rotation_net, train_rotation_net_deep_fashion, fine_tune_rotation_model, \
     fine_tune_rotation_model_deep_fashion, \
     test_classification_on_rotation_model, test_classification_on_rotation_model_deep_fashion
+from supervised_deep_fashion import train_supervised_deep_fashion, test_classification_deep_fashion,\
+    train_supervised_FashionMNIST, test_classification_on_supervised_fashionMNIST
 from utils import plot_n_curves
 
 print("====================================")
@@ -79,3 +81,28 @@ plot_n_curves(test_losses_ex_cnn_f, "Test loss", "Loss test ExemplarCNN FashionM
 test_losses_ex_cnn_df, test_acc_ex_cnn_df = test_classification_on_exemplar_cnn_deep_fashion(ex_cnn_df_trained_finetuned)
 plot_n_curves(test_acc_ex_cnn_df, "Test accuracy", "Loss test ExemplarCNN DeepFashion")
 plot_n_curves(test_losses_ex_cnn_df, "Test loss", "Loss test ExemplarCNN DeepFashion")
+
+################################################
+#           Supervised subtask                 #
+################################################
+
+# supervised training with DeepFashion
+sv_cnn_df_trained, train_losses_sv_cnn_df, train_acc_sv_cnn_df = train_supervised_deep_fashion()
+plot_n_curves([train_losses_sv_cnn_df], ["train loss"], "Loss train supervised DeepFashion")
+plot_n_curves([train_acc_sv_cnn_df], ["train accuracy"], "Accuracy train supervised DeepFashion")
+
+# # test with DeepFashion
+test_losses_sv_df, test_acc_sv_df = test_classification_deep_fashion(sv_cnn_df_trained)
+plot_n_curves(test_losses_sv_df, "Test loss", "Loss test supervised DeepFashion")
+plot_n_curves(test_acc_sv_df, "Test accuracy", "Accuracy test supervised DeepFashion")
+
+
+# supervised training with Fashion MNIST
+sv_mnist_trained, train_losses_sv_mnist, val_losses_sv_mnist, train_acc_sv_mnist, val_acc_sv_mnist = train_supervised_FashionMNIST()
+plot_n_curves([train_losses_sv_mnist, train_acc_sv_mnist], ["train loss"], "Loss train Supervised Fashion MNIST")
+plot_n_curves([train_acc_sv_mnist], ["train accuracy"], "Accuracy train supervised Fashion MNIST")
+
+# test with Fashion MNIST
+test_losses_sv_mnist, test_acc_sv_mnist = test_classification_on_supervised_fashionMNIST(sv_mnist_trained)
+plot_n_curves(test_losses_sv_mnist, "Test loss", "Loss test supervised Fashion MNIST")
+plot_n_curves(test_acc_sv_mnist, "Test accuracy", "Accuracy test supervised Fashion MNIST")
