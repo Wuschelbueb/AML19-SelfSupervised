@@ -2,17 +2,17 @@ import torch
 import torch.nn as nn
 
 from cifar_net import CifarNet
-from fashion_mnist_data_handler import train_loader_classification, val_loader_classification, test_loader_classification
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
+from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
+from fine_tune import fine_tune
 from test import test
-from train import train_and_val
 
 EPOCHS = 15
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-train_loader_classification = train_loader_classification()
-val_loader_classification = val_loader_classification()
-test_loader_classification = test_loader_classification()
+train_loader_fashion_mnist = train_loader_fashion_mnist()
+val_loader_fashion_mnist = val_loader_fashion_mnist()
+test_loader_fashion_mnist = test_loader_fashion_mnist()
 
 train_loader_deep_fashion = train_loader_deep_fashion()
 val_loader_deep_fashion = val_loader_deep_fashion()
@@ -37,8 +37,8 @@ def train_supervised_FashionMNIST():
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train_and_val(mnist_supervised_model, loss_fn, optimizer, scheduler, EPOCHS,
-                         train_loader_classification, val_loader_classification)
+    return fine_tune(mnist_supervised_model, loss_fn, optimizer, scheduler, EPOCHS,
+                     train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
 def train_supervised_deep_fashion():
@@ -59,7 +59,7 @@ def train_supervised_deep_fashion():
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    return train_and_val(df_supervised_model, loss_fn, optimizer, scheduler, EPOCHS,
+    return fine_tune(df_supervised_model, loss_fn, optimizer, scheduler, EPOCHS,
                          train_loader_deep_fashion, val_loader_deep_fashion)
 
 
@@ -73,7 +73,7 @@ def test_classification_on_supervised_fashionMNIST(model):
     loss_fn = nn.CrossEntropyLoss()
 
     model = model.to(device)
-    return test(model, loss_fn, EPOCHS, test_loader_classification)
+    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
 def test_classification_deep_fashion(model):
