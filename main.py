@@ -5,6 +5,7 @@ from exemplar_cnn import train_exemplar_cnn, fine_tune_exemplar_cnn, \
 from rotation import train_rotation_net, fine_tune_rotation_model, \
     test_classification_on_rotation_model
 from supervised_deep_fashion import train_supervised_deep_fashion, train_supervised_FashionMNIST
+from utils import plot_n_curves
 
 print("====================================")
 print("========== Load the data ===========")
@@ -14,9 +15,19 @@ print("====================================\n")
 ################################################
 #               AET sub task              #
 ################################################
-aet_f_trained, train_losses_aet_f, train_acc_aet_f = train_aet_cnn()
-encoder, train_losses, val_losses, train_accuracies, val_accuracies = transfer_learning_aet(aet_f_trained)
-accuracies = test_aet(encoder)
+
+# train AET with FashionMNIST
+aet_f_trained, decoder, train_losses_aet_f = train_aet_cnn()
+plot_n_curves(train_losses_aet_f, "Train losses", "Loss training AET Fashion MNIST")
+
+# transfer learning with FashionMNIST
+encoder, train_losses_aet, val_losses_aet, train_accuracies_aet, val_accuracies_aet = transfer_learning_aet(aet_f_trained)
+plot_n_curves([train_losses_aet, val_losses_aet], ["train loss", "val loss"], "Loss AET FashionMNIST")
+plot_n_curves([train_accuracies_aet, val_accuracies_aet], ["train accuracy", "val accuracy"], "Accuracy AET FashionMNIST")
+
+# fine tune with FashionMNIST
+accuracies_aet = test_aet(encoder)
+plot_n_curves(accuracies_aet, "test accuracy", "Accuracy Test AET Fashion MNIST")
 
 ################################################
 #               Rotation sub task              #
@@ -24,7 +35,7 @@ accuracies = test_aet(encoder)
 
 # train rotation net with FashionMNIST
 encoder, decoder, train_losses_aet_f = train_rotation_net()
-# plot_n_curves([train_losses_rot_f, val_losses_rot_f], ["rain loss", "val loss"], "Loss rotation FashionMNIST")
+# plot_n_curves([train_losses_rot_f, val_losses_rot_f], ["train loss", "val loss"], "Loss rotation FashionMNIST")
 # plot_n_curves([train_acc_rot_f, val_acc_rot_f], ["train accuracy", "val accuracy"], "Accuracy rotation FashionMNIST")
 
 # train rotation net with DeepFashion
