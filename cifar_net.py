@@ -24,16 +24,16 @@ class CifarNet(nn.Module):
         self.fc2 = nn.Linear(384, 192, bias=True)
         self.fc3 = nn.Linear(192, num_classes, bias=True)
 
-    def forward(self, input):
-        x = self.conv1(input)
-        x = self.max1(x)
-        x = self.batch1(x)
-        x = self.conv2(x)
-        x = self.batch2(x)
-        x = self.max2(x)
-        x = self.flat(x)
-        x = self.fc1(x)
-        x = self.drop(x)
-        x = self.fc2(x)
-        x = self.fc3(x)
-        return x
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.max1(out)
+        out = self.batch1(out)
+        out = self.conv2(out)
+        out = self.batch2(out)
+        out = self.max2(out)
+        out = self.flat(out)
+        out = self.fc1(out)
+        out = self.drop(out)
+        out = self.fc2(out)
+        out = self.fc3(out)
+        return out

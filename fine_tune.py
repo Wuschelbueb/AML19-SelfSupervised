@@ -4,7 +4,7 @@ import time
 import numpy as np
 import torch
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+from settings import DEVICE
 
 
 def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
@@ -28,8 +28,8 @@ def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, va
         running_corrects_train = 0.0
 
         for images, labels in train_loader:
-            images = images.to(device)
-            labels = labels.to(device)
+            images = images.to(DEVICE)
+            labels = labels.to(DEVICE)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -55,8 +55,8 @@ def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, va
         running_loss = []
         with torch.no_grad():
             for images, labels in val_loader:
-                images = images.to(device)
-                labels = labels.to(device)
+                images = images.to(DEVICE)
+                labels = labels.to(DEVICE)
 
                 # forward
                 outputs = model(images)

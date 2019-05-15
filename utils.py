@@ -4,10 +4,21 @@ Created on Tue May  7 14:49:27 2019
 @author: Gwenael
 """
 import os
-import numpy as np
+
 import matplotlib
+import numpy as np
+
+from settings import PLOT_DIRECTORY
+
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+
+
+def get_name(title):
+    split = title.split(' ')
+    s = '_'
+    concat_title = s.join(split)
+    return concat_title + '.pdf'
 
 
 def plot_n_curves(values, legend, title="n curves graph", axis1="epochs", axis2="loss/val"):
@@ -37,14 +48,11 @@ def plot_n_curves(values, legend, title="n curves graph", axis1="epochs", axis2=
     plt.ylabel(axis2)
     plt.title(title)
 
-    split = title.split(' ')
-    s = '_'
-    concat_title = s.join(split)
-    final_title = concat_title + '.pdf'
+    final_title = get_name(title)
 
     # Pick one of the following lines to uncomment
     # save_file = None
-    save_file = os.path.join('./', final_title)
+    save_file = os.path.join(PLOT_DIRECTORY, final_title)
 
     if save_file:
         plt.savefig(save_file)

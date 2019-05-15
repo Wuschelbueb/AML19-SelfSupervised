@@ -5,24 +5,19 @@ functions like loading the data and the data loader.
 
 from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import FashionMNIST
-from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 
 from fashion_mnist_dataset import FashionMNISTDataset
-
-BATCH_SIZE = 64
-ROOT_DIR = 'fashion_mnist'
-TARGET_SIZE = 32
-TRANSFORM = Compose([Resize(TARGET_SIZE), ToTensor(), Normalize(mean=(0.5,), std=(0.5,))])
+from settings import TRANSFORM_FASHION_MNIST, BATCH_SIZE, ROOT_DIR_FASHION_MNIST
 
 
 def train_data():
     """Download and load the training data."""
-    return FashionMNIST(root=ROOT_DIR, download=True, train=True, transform=TRANSFORM)
+    return FashionMNIST(root=ROOT_DIR_FASHION_MNIST, download=True, train=True, transform=TRANSFORM_FASHION_MNIST)
 
 
 def test_data():
     """Download and load the test data."""
-    return FashionMNIST(root=ROOT_DIR, download=True, train=False, transform=TRANSFORM)
+    return FashionMNIST(root=ROOT_DIR_FASHION_MNIST, download=True, train=False, transform=TRANSFORM_FASHION_MNIST)
 
 
 def train_loader_fashion_mnist():
@@ -34,7 +29,7 @@ def train_loader_fashion_mnist():
         targets=train_subset
     )
 
-    return DataLoader(train_set, batch_size=64, shuffle=True)
+    return DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
 
 
 def val_loader_fashion_mnist():
@@ -46,7 +41,7 @@ def val_loader_fashion_mnist():
         targets=val_subset
     )
 
-    return DataLoader(val_set, batch_size=64, shuffle=False)
+    return DataLoader(val_set, batch_size=BATCH_SIZE, shuffle=False)
 
 
 def test_loader_fashion_mnist():

@@ -11,10 +11,8 @@ from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
+from settings import DEVICE, EPOCHS
 from test import test
-
-EPOCHS = 2
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
 val_loader_fashion_mnist = val_loader_fashion_mnist()
@@ -44,7 +42,7 @@ def train_rotation_net():
     print("=============================================================\n")
 
     model = CifarNet(input_channels=1, num_classes=4)
-    model = model.to(device)
+    model = model.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -65,7 +63,7 @@ def train_rotation_net_deep_fashion():
     print("============================================================\n")
 
     model = CifarNet(input_channels=3, num_classes=4)
-    model = model.to(device)
+    model = model.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -107,7 +105,7 @@ def fine_tune_rotation_model(model):
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
@@ -137,7 +135,7 @@ def fine_tune_rotation_model_deep_fashion(model):
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
@@ -155,7 +153,7 @@ def test_classification_on_rotation_model(model):
                               nn.Linear(192, 10, bias=True)
                               )
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
@@ -173,7 +171,7 @@ def test_classification_on_rotation_model_deep_fashion(model):
                               nn.Linear(192, 50, bias=True)
                               )
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
 
 
@@ -198,8 +196,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
         running_corrects_train = 0.0
 
         for images, labels in train_loader:
-            images = images.to(device)
-            labels = labels.to(device)
+            images = images.to(DEVICE)
+            labels = labels.to(DEVICE)
 
             images_rotated = []
             labes_rotated = []
@@ -217,8 +215,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                 images_rotated.append(stack)
                 labes_rotated.append(rotation_labels)
 
-            images = torch.cat(images_rotated, dim=0).to(device)
-            labels = torch.cat(labes_rotated, dim=0).to(device)
+            images = torch.cat(images_rotated, dim=0).to(DEVICE)
+            labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -244,8 +242,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
         running_loss = []
         with torch.no_grad():
             for images, labels in val_loader:
-                images = images.to(device)
-                labels = labels.to(device)
+                images = images.to(DEVICE)
+                labels = labels.to(DEVICE)
 
                 images_rotated = []
                 labes_rotated = []
@@ -258,13 +256,13 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                         rotate(img, 270)
                     ]
                     rotation_labels = torch.LongTensor([0, 1, 2, 3])
-                    cat = torch.cat(rotated_imgs, dim=0)
+                    stack = torch.stack(rotated_imgs, dim=0)
 
-                    images_rotated.append(cat)
+                    images_rotated.append(stack)
                     labes_rotated.append(rotation_labels)
 
-                images = torch.cat(images_rotated, dim=0).to(device)
-                labels = torch.cat(labes_rotated, dim=0).to(device)
+                images = torch.cat(images_rotated, dim=0).to(DEVICE)
+                labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
 
                 # forward
                 outputs = model(images)

@@ -5,10 +5,8 @@ from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
+from settings import DEVICE, EPOCHS
 from test import test
-
-EPOCHS = 15
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
 val_loader_fashion_mnist = val_loader_fashion_mnist()
@@ -26,7 +24,7 @@ def train_supervised_FashionMNIST():
     print("=============================================================\n")
 
     mnist_supervised_model = CifarNet(input_channels=1, num_classes=10)
-    mnist_supervised_model = mnist_supervised_model.to(device)
+    mnist_supervised_model = mnist_supervised_model.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -48,7 +46,7 @@ def train_supervised_deep_fashion():
     print("============================================================\n")
 
     df_supervised_model = CifarNet(input_channels=3, num_classes=50)
-    df_supervised_model = df_supervised_model.to(device)
+    df_supervised_model = df_supervised_model.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -72,7 +70,7 @@ def test_classification_on_supervised_fashionMNIST(model):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
@@ -85,5 +83,5 @@ def test_classification_deep_fashion(model):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)

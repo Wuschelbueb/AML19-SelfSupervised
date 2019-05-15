@@ -12,10 +12,8 @@ from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
+from settings import DEVICE, EPOCHS
 from test import test
-
-EPOCHS = 1
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
 val_loader_fashion_mnist = val_loader_fashion_mnist()
@@ -47,7 +45,7 @@ def transform_image(image, transformation):
 
 
 def horizontal_flip(image):
-    """Flip image horiontally."""
+    """Flip image horizontally."""
     transform = Compose([
         RandomHorizontalFlip(p=1.0),
         Resize(32),
@@ -126,7 +124,7 @@ def train_exemplar_cnn():
 
     # number of predicted classes = number of training images
     exemplar_cnn = CifarNet(input_channels=1, num_classes=train_loader_fashion_mnist.batch_size)
-    exemplar_cnn = exemplar_cnn.to(device)
+    exemplar_cnn = exemplar_cnn.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -148,7 +146,7 @@ def train_exemplar_cnn_deep_fashion():
 
     # number of predicted classes = number of training images
     exemplar_cnn = CifarNet(input_channels=3, num_classes=train_loader_deep_fashion.batch_size)
-    exemplar_cnn = exemplar_cnn.to(device)
+    exemplar_cnn = exemplar_cnn.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
@@ -188,7 +186,7 @@ def fine_tune_exemplar_cnn(model):
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
@@ -218,7 +216,7 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
@@ -236,7 +234,7 @@ def test_classification_on_exemplar_cnn(model):
                               nn.Linear(192, 10, bias=True)
                               )
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
 
 
@@ -254,7 +252,7 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
                               nn.Linear(192, 50, bias=True)
                               )
 
-    model = model.to(device)
+    model = model.to(DEVICE)
     return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
 
 
@@ -277,8 +275,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
         running_corrects = 0
 
         for images, labels in train_loader:
-            images = images.to(device)
-            labels = labels.to(device)
+            images = images.to(DEVICE)
+            labels = labels.to(DEVICE)
 
             images_transformed = []
             labes_transformed = []
@@ -298,8 +296,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
                 images_transformed.append(stack)
                 labes_transformed.append(transformed_labels)
 
-            images = torch.cat(images_transformed, dim=0).to(device)
-            labels = torch.cat(labes_transformed, dim=0).to(device)
+            images = torch.cat(images_transformed, dim=0).to(DEVICE)
+            labels = torch.cat(labes_transformed, dim=0).to(DEVICE)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -324,8 +322,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
         train_accuracies.append((100.0 * running_corrects) / (6 * len(train_loader.dataset)))
 
         # deep copy the model
-        if running_corrects > best_acc:
-            best_acc = running_corrects
+        if train_accuracies[-1] > best_acc:
+            best_acc = train_accuracies[-1]
             best_model_wts = model.state_dict()
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}'.format(
@@ -337,6 +335,6 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
     model.load_state_dict(best_model_wts)  # load best model weights
 
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
+    print('Best accuracy: {:4f}'.format(best_acc))
 
     return model, train_losses, train_accuracies

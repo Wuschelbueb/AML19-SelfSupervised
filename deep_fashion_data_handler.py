@@ -7,20 +7,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 
 from deep_fashion_dataset import DeepFashionDataset
-
-ROOT_DIR = 'img/'
-TARGET_SIZE = (32, 32)
-BATCH_SIZE = 64
-
-
-# def load_images():
-#     """Load the images from the root directory."""
-#     transforms = Compose([
-#         Resize(TARGET_SIZE),
-#         ToTensor(),
-#         Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
-#     ])
-#     return ImageFolder(ROOT_DIR, transform=transforms)
+from settings import ROOT_DIR_DEEP_FASHION, BATCH_SIZE
 
 
 def load_list_category_img():
@@ -44,57 +31,6 @@ def load_list_eval_partition():
     return list_eval_partition
 
 
-# def train_data():
-#     """Return the images with the evaluation status 'train'."""
-#     images = load_images()
-#     partition = load_list_eval_partition()
-#     labels = load_list_category_img()
-#
-#     train_indices = partition[partition.evaluation_status == 'train'].index
-#     train_images = Subset(images, train_indices)
-#     train_labels = labels.category_label[train_indices].values
-#
-#     return DeepFashionDataset(train_images, train_labels)
-#
-#
-# def val_data():
-#     """Return the images with the evaluation status 'val'."""
-#     images = load_images()
-#     partition = load_list_eval_partition()
-#     labels = load_list_category_img()
-#
-#     val_indices = partition[partition.evaluation_status == 'val'].index
-#     val_images = Subset(images, val_indices)
-#     val_labels = labels.category_label[val_indices].values
-#     return DeepFashionDataset(val_images, val_labels)
-#
-#
-# def test_data():
-#     """Return the images with the evaluation status 'test'."""
-#     images = load_images()
-#     partition = load_list_eval_partition()
-#     labels = load_list_category_img()
-#
-#     test_indices = partition[partition.evaluation_status == 'test'].index
-#     test_images = Subset(images, test_indices)
-#     test_labels = labels.category_label[test_indices].values
-#     return DeepFashionDataset(test_images, test_labels)
-
-
-# def train_loader_deep_fashion():
-#     """Return the data loader for the train data."""
-#     return DataLoader(train_data(), batch_size=BATCH_SIZE, shuffle=True)
-#
-#
-# def val_loader_deep_fashion():
-#     """Return the data loader for the validation data."""
-#     return DataLoader(val_data(), batch_size=BATCH_SIZE, shuffle=False)
-#
-#
-# def test_loader_deep_fashion():
-#     """Return the data loader for the test data."""
-#     return DataLoader(test_data(), batch_size=BATCH_SIZE, shuffle=False)
-
 def train_data():
     """Return the images with the evaluation status 'train'."""
     partition = load_list_eval_partition()
@@ -106,7 +42,7 @@ def train_data():
     list_train_images = result.image_name.values
     train_labels = labels.category_label[train_indices].values
 
-    return DeepFashionDataset(root="./", flist=list_train_images, targets=train_labels)
+    return DeepFashionDataset(root=ROOT_DIR_DEEP_FASHION, image_list=list_train_images, targets=train_labels)
 
 
 def val_data():
@@ -120,7 +56,7 @@ def val_data():
     list_val_images = result.image_name.values
     val_labels = labels.category_label[val_indices].values
 
-    return DeepFashionDataset(root="./", flist=list_val_images, targets=val_labels)
+    return DeepFashionDataset(root=ROOT_DIR_DEEP_FASHION, image_list=list_val_images, targets=val_labels)
 
 
 def test_data():
@@ -134,7 +70,7 @@ def test_data():
     list_test_images = result.image_name.values
     test_labels = labels.category_label[test_indices].values
 
-    return DeepFashionDataset(root="./", flist=list_test_images, targets=test_labels)
+    return DeepFashionDataset(root=ROOT_DIR_DEEP_FASHION, image_list=list_test_images, targets=test_labels)
 
 
 def train_loader_deep_fashion():
