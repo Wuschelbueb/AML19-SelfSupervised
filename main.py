@@ -1,5 +1,5 @@
 """Main"""
-
+from AET import train_aet_cnn, transfer_learning_aet, test_aet
 from exemplar_cnn import train_exemplar_cnn, fine_tune_exemplar_cnn, \
     test_classification_on_exemplar_cnn
 from rotation import train_rotation_net, fine_tune_rotation_model, \
@@ -10,12 +10,20 @@ print("====================================")
 print("========== Load the data ===========")
 print("====================================\n")
 
+
+################################################
+#               AET sub task              #
+################################################
+aet_f_trained, train_losses_aet_f, train_acc_aet_f = train_aet_cnn()
+encoder, train_losses, val_losses, train_accuracies, val_accuracies = transfer_learning_aet(aet_f_trained)
+accuracies = test_aet(encoder)
+
 ################################################
 #               Rotation sub task              #
 ################################################
 
 # train rotation net with FashionMNIST
-rot_f_trained, train_losses_rot_f, val_losses_rot_f, train_acc_rot_f, val_acc_rot_f = train_rotation_net()
+encoder, decoder, train_losses_aet_f = train_rotation_net()
 # plot_n_curves([train_losses_rot_f, val_losses_rot_f], ["rain loss", "val loss"], "Loss rotation FashionMNIST")
 # plot_n_curves([train_acc_rot_f, val_acc_rot_f], ["train accuracy", "val accuracy"], "Accuracy rotation FashionMNIST")
 
