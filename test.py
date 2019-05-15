@@ -22,5 +22,5 @@ def test(model, loss_fn, test_loader):
     average_test_loss = test_loss / len(test_loader.dataset)
     average_test_accuracy = 100.0 * n_correct / len(test_loader.dataset)
 
-    print('Test average loss: {:.4f}, accuracy: {:.3f}'.format(average_test_loss), average_test_accuracy)
+    print('Test average loss:', average_test_loss, 'accuracy:', average_test_accuracy)
     return average_test_loss, average_test_accuracy
