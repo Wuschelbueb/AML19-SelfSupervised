@@ -1,6 +1,6 @@
 """Test methods."""
-import torch
 import numpy as np
+import torch
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -25,11 +25,16 @@ def test(model, loss_fn, num_epochs, test_loader):
                 # forward
                 outputs = model(images)
                 _, preds = torch.max(outputs.data, 1)
+                print('preds: {}'.format(preds))
                 loss = loss_fn(outputs, labels)
+                print('loss: {}'.format(loss))
 
                 # statistics
                 losses.append(loss.item())
-                corrects += torch.sum(preds == labels.data).to(torch.float32)
+                correct = torch.sum(preds == labels.data).to(torch.float32)
+                corrects += correct
+                print('losses: {}'.format(losses))
+                print('correct: {}'.format(correct))
 
         test_losses.append(np.mean(losses))
         test_accuracies.append(100.0 * corrects / len(test_loader.dataset))
