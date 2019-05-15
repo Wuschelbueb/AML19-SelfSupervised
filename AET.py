@@ -138,7 +138,7 @@ def train(encoder, decoder, loss_fn, optimizer, scheduler, num_epochs, train_loa
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Average loss: {:4f}'.format(np.mean(train_losses)))
 
-    return encoder, decoder, train_losses
+    return encoder, train_losses
 
 
 
