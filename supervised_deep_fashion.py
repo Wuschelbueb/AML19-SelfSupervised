@@ -71,7 +71,7 @@ def test_classification_on_supervised_fashionMNIST(model):
     loss_fn = nn.CrossEntropyLoss()
 
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
+    return test(model, loss_fn, test_loader_fashion_mnist)
 
 
 def test_classification_deep_fashion(model):
@@ -84,4 +84,4 @@ def test_classification_deep_fashion(model):
     loss_fn = nn.CrossEntropyLoss()
 
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
+    return test(model, loss_fn, test_loader_deep_fashion)

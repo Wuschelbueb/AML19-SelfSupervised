@@ -152,7 +152,7 @@ def test_aet_deep_fashion(encoder):
 
     loss_fn = nn.CrossEntropyLoss()
 
-    return test(encoder, loss_fn, EPOCHS, test_loader_deep_fashion)
+    return test(encoder, loss_fn, test_loader_deep_fashion)
 
 
 def train(encoder, decoder, loss_fn, optimizer, scheduler, num_epochs, train_loader):
