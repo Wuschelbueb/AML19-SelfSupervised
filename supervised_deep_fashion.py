@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-
 from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
 from settings import DEVICE, EPOCHS
 from test import test
+from fine_tune import fine_tune
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
 val_loader_fashion_mnist = val_loader_fashion_mnist()

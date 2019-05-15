@@ -1,5 +1,6 @@
 """Main"""
 import time
+from AET import train_aet_cnn, transfer_learning_aet, test_aet
 
 from exemplar_cnn import train_exemplar_cnn, fine_tune_exemplar_cnn, \
     test_classification_on_exemplar_cnn, train_exemplar_cnn_deep_fashion, fine_tune_exemplar_cnn_deep_fashion, \
@@ -16,6 +17,24 @@ since = time.time()
 print("====================================")
 print("========== Load the data ===========")
 print("====================================\n")
+
+
+################################################
+#               AET sub task              #
+################################################
+
+# train AET with FashionMNIST
+aet_f_trained, train_losses_aet_f = train_aet_cnn()
+plot_n_curves(train_losses_aet_f, "Train losses", "Loss training AET Fashion MNIST")
+
+# transfer learning with FashionMNIST
+encoder, train_losses_aet, val_losses_aet, train_accuracies_aet, val_accuracies_aet = transfer_learning_aet(aet_f_trained)
+plot_n_curves([train_losses_aet, val_losses_aet], ["train loss", "val loss"], "Loss AET FashionMNIST")
+plot_n_curves([train_accuracies_aet, val_accuracies_aet], ["train accuracy", "val accuracy"], "Accuracy AET FashionMNIST")
+
+# fine tune with FashionMNIST
+accuracies_aet = test_aet(encoder)
+plot_n_curves(accuracies_aet, "test accuracy", "Accuracy Test AET Fashion MNIST")
 
 ################################################
 #               Rotation sub task              #
