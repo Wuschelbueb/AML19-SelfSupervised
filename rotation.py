@@ -13,7 +13,7 @@ from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fa
 from fine_tune import fine_tune
 from test import test
 
-EPOCHS = 1
+EPOCHS = 2
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
@@ -30,7 +30,10 @@ def rotate(image, angle):
     image = tf.to_pil_image(image)
     image = tf.rotate(image, angle)
     image = tf.to_tensor(image)
-    image = tf.normalize(image, (0.5,), (0.5,))
+    if image.shape[0] == 3:
+        image = tf.normalize(image, (0.5, 0.5, 0.5,), (0.5, 0.5, 0.5,))
+    else:
+        image = tf.normalize(image, (0.5,), (0.5,))
     return image
 
 
@@ -214,8 +217,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                 images_rotated.append(stack)
                 labes_rotated.append(rotation_labels)
 
-            images = torch.cat(images_rotated, dim=0)
-            labels = torch.cat(labes_rotated, dim=0)
+            images = torch.cat(images_rotated, dim=0).to(device)
+            labels = torch.cat(labes_rotated, dim=0).to(device)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -234,7 +237,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
             running_corrects_train += torch.sum(preds == labels.data).to(torch.float32)
 
         train_losses.append(np.mean(np.array(running_loss)))
-        train_accuracies.append(100.0 * running_corrects_train / len(train_loader.dataset))
+        train_accuracies.append((100.0 * running_corrects_train) / (4 * len(train_loader.dataset)))
 
         model.eval()
         running_corrects_val = 0.0
@@ -260,8 +263,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                     images_rotated.append(cat)
                     labes_rotated.append(rotation_labels)
 
-                images = torch.cat(images_rotated, dim=0).unsqueeze(1)
-                labels = torch.cat(labes_rotated, dim=0)
+                images = torch.cat(images_rotated, dim=0).to(device)
+                labels = torch.cat(labes_rotated, dim=0).to(device)
 
                 # forward
                 outputs = model(images)
@@ -273,7 +276,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                 running_corrects_val += torch.sum(preds == labels.data).to(torch.float32)
 
         val_losses.append(np.mean(np.array(running_loss)))
-        val_accuracies.append(100.0 * running_corrects_val / len(val_loader.dataset))
+        val_accuracies.append((100.0 * running_corrects_val) / (4 * len(val_loader.dataset)))
 
         if val_accuracies[-1] > best_acc:
             best_acc = val_accuracies[-1]

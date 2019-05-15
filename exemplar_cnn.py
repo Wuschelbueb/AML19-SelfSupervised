@@ -28,8 +28,9 @@ test_loader_deep_fashion = test_loader_deep_fashion()
 
 def transform_image(image, transformation):
     """Randomly transforms one image."""
+    image = image.cpu()
     transform = ToPILImage()
-    img = transform(image.cpu())
+    img = transform(image)
 
     if transformation == 0:
         return horizontal_flip(img)
@@ -297,8 +298,8 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
                 images_transformed.append(stack)
                 labes_transformed.append(transformed_labels)
 
-            images = torch.cat(images_transformed, dim=0)
-            labels = torch.cat(labes_transformed, dim=0)
+            images = torch.cat(images_transformed, dim=0).to(device)
+            labels = torch.cat(labes_transformed, dim=0).to(device)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -320,7 +321,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             running_corrects += torch.sum(preds == labels.data).to(torch.float32)
 
         train_losses.append(np.mean(np.array(running_loss)))
-        train_accuracies.append(100.0 * running_corrects / len(train_loader.dataset))
+        train_accuracies.append((100.0 * running_corrects) / (6 * len(train_loader.dataset)))
 
         # deep copy the model
         if running_corrects > best_acc:

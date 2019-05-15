@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
-
 from cifar_net import CifarNet
-from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
+from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from test import test
 from fine_tune import fine_tune
 
