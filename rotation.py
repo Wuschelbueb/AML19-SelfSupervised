@@ -25,6 +25,7 @@ test_loader_deep_fashion = test_loader_deep_fashion()
 
 def rotate(image, angle):
     """Rotate the image by the specified angle"""
+    image = image.cpu()
     image = tf.to_pil_image(image)
     image = tf.rotate(image, angle)
     image = tf.to_tensor(image)
@@ -32,6 +33,7 @@ def rotate(image, angle):
         image = tf.normalize(image, (0.5, 0.5, 0.5,), (0.5, 0.5, 0.5,))
     else:
         image = tf.normalize(image, (0.5,), (0.5,))
+    image = image.cuda()
     return image
 
 

@@ -9,10 +9,8 @@ from decoder import Decoder
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
+from settings import DEVICE, EPOCHS
 from test import test
-
-EPOCHS = 1
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
 val_loader_fashion_mnist = val_loader_fashion_mnist()
@@ -45,10 +43,10 @@ def train_aet_cnn():
 
     # number of predicted classes = number of training images
     encoder = CifarNet(input_channels=1, num_classes=10)
-    encoder = encoder.to(device)
+    encoder = encoder.to(DEVICE)
 
     decoder = Decoder(input_channels=64, num_classes=10)
-    decoder = decoder.to(device)
+    decoder = decoder.to(DEVICE)
 
     parameters = list(encoder.parameters()) + list(decoder.parameters())
 
@@ -79,7 +77,7 @@ def transfer_learning_aet(encoder):
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
 
-    encoder = encoder.to(device)
+    encoder = encoder.to(DEVICE)
 
     return fine_tune(encoder, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
@@ -90,7 +88,7 @@ def test_aet(encoder):
     print("============== Testing AET with FashionMNIST ================")
     print("=============================================================\n")
 
-    encoder = encoder.to(device)
+    encoder = encoder.to(DEVICE)
 
     loss_fn = nn.CrossEntropyLoss()
 
@@ -112,7 +110,7 @@ def train(encoder, decoder, loss_fn, optimizer, scheduler, num_epochs, train_loa
         running_loss = []
 
         for images, labels in train_loader:
-            images = images.to(device)
+            images = images.to(DEVICE)
 
             # zero the parameter gradients
             optimizer.zero_grad()
