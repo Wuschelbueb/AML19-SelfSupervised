@@ -1,7 +1,9 @@
+import time
+
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-import time
+
 from cifar_net import CifarNet
 from decoder import Decoder
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
