@@ -235,7 +235,7 @@ def test_classification_on_exemplar_cnn(model):
                               )
 
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
+    return test(model, loss_fn, test_loader_fashion_mnist)
 
 
 def test_classification_on_exemplar_cnn_deep_fashion(model):
@@ -253,7 +253,7 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
                               )
 
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
+    return test(model, loss_fn, test_loader_deep_fashion)
 
 
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
