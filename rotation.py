@@ -33,7 +33,8 @@ def rotate(image, angle):
         image = tf.normalize(image, (0.5, 0.5, 0.5,), (0.5, 0.5, 0.5,))
     else:
         image = tf.normalize(image, (0.5,), (0.5,))
-    image = image.cuda()
+    if torch.cuda.is_available():
+        image = image.cuda()
     return image
 
 
