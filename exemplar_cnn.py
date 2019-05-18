@@ -66,6 +66,8 @@ def horizontal_flip(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -90,6 +92,8 @@ def random_crop(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -114,6 +118,8 @@ def color_jitter(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -138,6 +144,8 @@ def random_resized_crop(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -162,6 +170,8 @@ def random_rotation(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -186,6 +196,8 @@ def random_affine_transformation(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
+    if torch.cuda.is_available():
+        img = img.cuda()
     return img
 
 
@@ -320,6 +332,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
 
     train_losses, train_accuracies = [], []
     best_acc = 0.0
+    image_index = 0
     since = time.time()
 
     for epoch in range(num_epochs):
@@ -334,6 +347,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             images_transformed, labes_transformed = [], []
 
             for index, img in enumerate(images):
+                image_index += image_index
                 transformed_imgs = [
                     img,
                     transform_image(img, 0),
@@ -343,7 +357,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
                     transform_image(img, 4),
                     transform_image(img, 5),
                 ]
-                transformed_labels = torch.LongTensor([index, index, index, index, index, index, index])
+                transformed_labels = torch.LongTensor([image_index, image_index, image_index, image_index, image_index, image_index, image_index])
                 stack = torch.stack(transformed_imgs, dim=0)
 
                 images_transformed.append(stack)

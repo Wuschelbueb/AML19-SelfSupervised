@@ -7,8 +7,8 @@ from settings import DEVICE
 def test(model, loss_fn, test_loader):
     """Tests the model on data from test_loader"""
     model.eval()
-    test_loss = 0
-    n_correct = 0
+    test_loss = 0.0
+    n_correct = 0.0
 
     with torch.no_grad():
         for images, labels in test_loader:
