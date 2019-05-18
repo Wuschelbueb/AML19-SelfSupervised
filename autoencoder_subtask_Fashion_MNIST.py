@@ -14,10 +14,10 @@ def autoencoder_subtask_fashion_MNIST():
 
     # transfer learning with FashionMNIST
     encoder_ft, train_losses_ft, val_losses_ft, train_acc_ft, val_acc_ft = transfer_learning_autoencoder_mnist(encoder_trained)
-    plot_n_curves([train_losses_ft, val_losses_ft], ["train loss", "val loss"],
-                  "Loss autoencoder FashionMNIST", axis2="Loss")
-    plot_n_curves([train_acc_ft, val_acc_ft], ["train accuracy", "val accuracy"],
-                  "Accuracy autoencoder FashionMNIST", axis2="Accuracy")
+    # plot_n_curves([train_losses_ft, val_losses_ft], ["train loss", "val loss"],
+    #               "Loss autoencoder FashionMNIST", axis2="Loss")
+    # plot_n_curves([train_acc_ft, val_acc_ft], ["train accuracy", "val accuracy"],
+    #               "Accuracy autoencoder FashionMNIST", axis2="Accuracy")
 
     # test with FashionMNIST
     average_test_loss, average_test_accuracy = test_autoencoder_mnist(encoder_ft)

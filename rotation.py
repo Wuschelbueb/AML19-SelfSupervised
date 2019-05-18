@@ -6,7 +6,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision.transforms.functional as tf
-import torchvision as tv
 
 from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
@@ -25,29 +24,25 @@ val_loader_deep_fashion = val_loader_deep_fashion()
 test_loader_deep_fashion = test_loader_deep_fashion()
 
 
-
-
-def createRotatedImagesandLabels(images):
+def create_rotated_images_and_labels(images):
     images = images.cpu()
     images = [tf.to_pil_image(x) for x in images]
-    numberOfImages = len(images)
+    number_of_images = len(images)
 
     images = [tf.rotate(x, 0) for x in images] \
              + [tf.rotate(x, 90) for x in images] \
              + [tf.rotate(x, 180) for x in images] \
              + [tf.rotate(x, 270) for x in images]
 
-    rotation_labels = np.repeat(0, numberOfImages).tolist() \
-                      + np.repeat(1, numberOfImages).tolist() \
-                      + np.repeat(2, numberOfImages).tolist() \
-                      + np.repeat(3, numberOfImages).tolist()
+    rotation_labels = np.repeat(0, number_of_images).tolist() \
+                      + np.repeat(1, number_of_images).tolist() \
+                      + np.repeat(2, number_of_images).tolist() \
+                      + np.repeat(3, number_of_images).tolist()
 
     images = [tf.to_tensor(x) for x in images]
     images = torch.stack(images).to(DEVICE)
     labels = torch.LongTensor(rotation_labels).to(DEVICE)
     return images, labels
-
-
 
 
 def rotate(image, angle):
@@ -235,7 +230,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
             # images = torch.cat(images_rotated, dim=0).to(DEVICE)
             # labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
 
-            images, labels = createRotatedImagesandLabels(images)
+            images, labels = create_rotated_images_and_labels(images)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -286,7 +281,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                 # images = torch.cat(images_rotated, dim=0).to(DEVICE)
                 # labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
 
-                images, labels = createRotatedImagesandLabels(images)
+                images, labels = create_rotated_images_and_labels(images)
 
                 # forward
                 outputs = model(images)
