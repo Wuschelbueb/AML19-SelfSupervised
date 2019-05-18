@@ -227,14 +227,7 @@ def test_classification_on_exemplar_cnn(model):
     print("=== Test Classification on Exemplar CNN with FashionMNIST ===")
     print("=============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 10, bias=True)
-                              )
-
     model = model.to(DEVICE)
     return test(model, loss_fn, test_loader_fashion_mnist)
 
@@ -245,14 +238,7 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
     print("=== Test Classification on Exemplar CNN with DeepFashion ===")
     print("============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 50, bias=True)
-                              )
-
     model = model.to(DEVICE)
     return test(model, loss_fn, test_loader_deep_fashion)
 

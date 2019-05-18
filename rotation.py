@@ -149,14 +149,7 @@ def test_classification_on_rotation_model(model):
     print("== Test Classification on Rotation Model with FashionMNIST ==")
     print("=============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 10, bias=True)
-                              )
-
     model = model.to(DEVICE)
     return test(model, loss_fn, test_loader_fashion_mnist)
 
@@ -167,9 +160,7 @@ def test_classification_on_rotation_model_deep_fashion(model):
     print("== Test Classification on Rotation Model with DeepFashion ==")
     print("============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
     model = model.to(DEVICE)
     return test(model, loss_fn, test_loader_deep_fashion)
 
