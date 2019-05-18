@@ -7,7 +7,8 @@ import pandas as pd
 from torch.utils.data import DataLoader
 
 from deep_fashion_dataset import DeepFashionDataset
-from settings import ROOT_DIR_DEEP_FASHION, BATCH_SIZE
+from settings import ROOT_DIR_DEEP_FASHION, BATCH_SIZE, SIZE_DEEP_FASHION_TRAIN, SIZE_DEEP_FASHION_VAL, \
+    SIZE_DEEP_FASHION_TEST
 
 
 def load_list_category_img():
@@ -37,6 +38,7 @@ def train_data():
     labels = load_list_category_img()
 
     result = partition[partition.evaluation_status == 'train']
+    result = result.sample(SIZE_DEEP_FASHION_TRAIN)
     train_indices = result.index
 
     list_train_images = result.image_name.values
@@ -51,6 +53,7 @@ def val_data():
     labels = load_list_category_img()
 
     result = partition[partition.evaluation_status == 'val']
+    result = result.sample(SIZE_DEEP_FASHION_VAL)
     val_indices = result.index
 
     list_val_images = result.image_name.values
@@ -65,6 +68,7 @@ def test_data():
     labels = load_list_category_img()
 
     result = partition[partition.evaluation_status == 'test']
+    result = result.sample(SIZE_DEEP_FASHION_TEST)
     test_indices = result.index
 
     list_test_images = result.image_name.values
