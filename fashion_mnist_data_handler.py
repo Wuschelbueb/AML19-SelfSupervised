@@ -22,7 +22,7 @@ def test_data():
 
 def train_loader_fashion_mnist():
     """Creates the data loader for the train data."""
-    train_subset, _ = train_val_subset(0.8)
+    train_subset, _ = train_val_subset(0.7)
 
     train_set = FashionMNISTDataset(
         data=train_subset,
@@ -34,7 +34,7 @@ def train_loader_fashion_mnist():
 
 def val_loader_fashion_mnist():
     """Creates the data loader for the validation data."""
-    _, val_subset = train_val_subset(0.8)
+    _, val_subset = train_val_subset(0.7)
 
     val_set = FashionMNISTDataset(
         data=val_subset,

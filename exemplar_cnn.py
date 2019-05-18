@@ -13,7 +13,7 @@ from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
 from settings import DEVICE, EPOCHS, LEARNING_RATE_TRAIN, WEIGHT_DECAY, STEP_SIZE_TRAIN, GAMMA, LEARNING_RATE_FINE_TUNE, \
-    STEP_SIZE_FINE_TUNE
+    STEP_SIZE_FINE_TUNE, EPOCHS_FINE_TUNE
 from test import test
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
@@ -131,7 +131,7 @@ def train_exemplar_cnn():
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN, weight_decay=None)
+    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN)
 
     # Decay LR by a factor of 0.1
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
@@ -153,7 +153,7 @@ def train_exemplar_cnn_deep_fashion():
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN, weight_decay=None)
+    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
@@ -188,7 +188,7 @@ def fine_tune_exemplar_cnn(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
 def fine_tune_exemplar_cnn_deep_fashion(model):
@@ -218,7 +218,7 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_deep_fashion, val_loader_deep_fashion)
 
 
 def test_classification_on_exemplar_cnn(model):
