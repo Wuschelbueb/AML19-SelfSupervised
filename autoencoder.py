@@ -93,7 +93,7 @@ def transfer_learning_autoencoder_mnist(encoder):
                                  train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
-def transfer_learning_autoencoder_deep_fashion(encoder, decoder):
+def transfer_learning_autoencoder_deep_fashion(encoder):
     """Fine tunes the autoencoder for DeepFashion."""
     print("=============================================================")
     print("=========== Transfer Learning with DeepFashion ==============")
@@ -105,7 +105,7 @@ def transfer_learning_autoencoder_deep_fashion(encoder, decoder):
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(list(decoder.parameters())+list(encoder.parameters()),
+    optimizer = torch.optim.Adam(list(encoder.parameters()),
                                  lr=LEARNING_RATE_FINE_TUNE,
                                  weight_decay=WEIGHT_DECAY)
 
