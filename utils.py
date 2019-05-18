@@ -39,10 +39,10 @@ def plot_n_curves(values, legend, title="n curves graph", axis1="epochs", axis2=
     if isinstance(values[0], list):
         # if it is a list of lists
         for v in values:
-            plt.plot(np.arange(len(v)), v)
+            plt.plot(np.arange(1, len(v) + 1), v)
     else:
         # else it is only one single list
-        plt.plot(np.arange(len(values)), values)
+        plt.plot(np.arange(1, len(values) + 1), values)
     plt.legend(legend)
     plt.xlabel(axis1)
     plt.ylabel(axis2)
@@ -79,10 +79,10 @@ def plot_summary(values, const, legend, title="n curves graph", axis1="epochs", 
     if isinstance(values[0], list):
         # if it is a list of lists
         for v in values:
-            plt.plot(np.arange(len(v)), v)
+            plt.plot(np.arange(1, len(v) + 1), v)
     else:
         # else it is only one single list
-        plt.plot(np.arange(len(values)), values)
+        plt.plot(np.arange(1, len(values) + 1), values)
     plt.axhline(y=const, color='r', linestyle='--')
     plt.legend(legend)
     plt.xlabel(axis1)
