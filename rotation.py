@@ -148,11 +148,11 @@ def fine_tune_rotation_model_deep_fashion(model):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
     # replace fc layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
