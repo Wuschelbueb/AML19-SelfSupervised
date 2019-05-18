@@ -1,4 +1,4 @@
-from supervised_deep_fashion import test_classification_deep_fashion, train_supervised_deep_fashion
+from supervised import test_classification_deep_fashion, train_supervised_deep_fashion
 from utils import plot_summary
 
 ################################################
