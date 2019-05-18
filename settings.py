@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--learning_rate_train', default=0.001, type=float)
 parser.add_argument('--learning_rate_fine_tune', default=0.001, type=float)
 parser.add_argument('--epochs_train', default=15, type=int)
-parser.add_argument('--epochs_fine_tune', default=5, type=int)
+parser.add_argument('--epochs_fine_tune', default=15, type=int)
 args = parser.parse_args()
 
 

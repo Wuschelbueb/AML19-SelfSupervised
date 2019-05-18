@@ -75,7 +75,7 @@ def test_data():
 
 def train_loader_deep_fashion():
     """Return the data loader for the train data."""
-    return DataLoader(train_data(), batch_size=BATCH_SIZE, shuffle=False)
+    return DataLoader(train_data(), batch_size=BATCH_SIZE, shuffle=True)
 
 
 def val_loader_deep_fashion():
