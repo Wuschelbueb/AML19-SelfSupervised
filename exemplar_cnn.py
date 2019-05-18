@@ -53,7 +53,19 @@ def horizontal_flip(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomHorizontalFlip(p=1.0),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5,0.5,0.5), std=(0.5,0.5,0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -65,7 +77,19 @@ def random_crop(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomCrop((20, 20)),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -77,7 +101,19 @@ def color_jitter(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.02),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -89,7 +125,19 @@ def random_resized_crop(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomResizedCrop(40, scale=(0.2, 1.0), ratio=(0.75, 1.333)),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -101,7 +149,19 @@ def random_rotation(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomRotation(45),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -113,7 +173,19 @@ def random_affine_transformation(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.8, 1.3), shear=10),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
     return img
 
 
@@ -246,12 +318,8 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
     """Train the model"""
 
-    train_losses = []
-    train_accuracies = []
-
-    best_model_wts = model.state_dict()
+    train_losses, train_accuracies = [], []
     best_acc = 0.0
-
     since = time.time()
 
     for epoch in range(num_epochs):
@@ -263,13 +331,11 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
 
         for images, labels in train_loader:
             images = images.to(DEVICE)
-            labels = labels.to(DEVICE)
-
-            images_transformed = []
-            labes_transformed = []
+            images_transformed, labes_transformed = [], []
 
             for index, img in enumerate(images):
                 transformed_imgs = [
+                    img,
                     transform_image(img, 0),
                     transform_image(img, 1),
                     transform_image(img, 2),
@@ -277,7 +343,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
                     transform_image(img, 4),
                     transform_image(img, 5),
                 ]
-                transformed_labels = torch.LongTensor([index, index, index, index, index, index])
+                transformed_labels = torch.LongTensor([index, index, index, index, index, index, index])
                 stack = torch.stack(transformed_imgs, dim=0)
 
                 images_transformed.append(stack)
@@ -292,9 +358,6 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             # forward
             outputs = model(images)
             _, preds = torch.max(outputs.data, 1)
-
-            # print("outputs shape", outputs.shape)
-
             loss = loss_fn(outputs, labels)
 
             # backward + optimize only if in training phase
@@ -306,12 +369,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             running_corrects += torch.sum(preds == labels.data).to(torch.float32)
 
         train_losses.append(np.mean(np.array(running_loss)))
-        train_accuracies.append((100.0 * running_corrects) / (6 * len(train_loader.dataset)))
-
-        # deep copy the model
-        if train_accuracies[-1] > best_acc:
-            best_acc = train_accuracies[-1]
-            best_model_wts = model.state_dict()
+        train_accuracies.append((100.0 * running_corrects) / (7 * len(train_loader.dataset)))
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs,
@@ -319,7 +377,6 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             train_accuracies[-1]))
 
     time_elapsed = time.time() - since
-    model.load_state_dict(best_model_wts)  # load best model weights
 
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best accuracy: {:4f}'.format(best_acc))
