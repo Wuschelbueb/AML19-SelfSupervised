@@ -24,6 +24,27 @@ val_loader_deep_fashion = val_loader_deep_fashion()
 test_loader_deep_fashion = test_loader_deep_fashion()
 
 
+def create_rotated_images_and_labels(images):
+    images = images.cpu()
+    images = [tf.to_pil_image(x) for x in images]
+    number_of_images = len(images)
+
+    images = [tf.rotate(x, 0) for x in images] \
+             + [tf.rotate(x, 90) for x in images] \
+             + [tf.rotate(x, 180) for x in images] \
+             + [tf.rotate(x, 270) for x in images]
+
+    rotation_labels = np.repeat(0, number_of_images).tolist() \
+                      + np.repeat(1, number_of_images).tolist() \
+                      + np.repeat(2, number_of_images).tolist() \
+                      + np.repeat(3, number_of_images).tolist()
+
+    images = [tf.to_tensor(x) for x in images]
+    images = torch.stack(images).to(DEVICE)
+    labels = torch.LongTensor(rotation_labels).to(DEVICE)
+    return images, labels
+
+
 def rotate(image, angle):
     """Rotate the image by the specified angle"""
     image = image.cpu()
@@ -92,11 +113,11 @@ def fine_tune_rotation_model(model):
 
     # freezes all layers except the final one, according to the method parameters
 
-    for param in model.parameters():
-        param.requires_grad = False
+    # for param in model.parameters():
+    #     param.requires_grad = False
 
-    for param in model.fc3.parameters():
-        param.requires_grad = True
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
     # replace fc layer with 10 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
@@ -122,11 +143,11 @@ def fine_tune_rotation_model_deep_fashion(model):
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
     # replace fc layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
@@ -186,33 +207,37 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
         running_corrects_train = 0.0
 
         for images, labels in train_loader:
+
             images = images.to(DEVICE)
             labels = labels.to(DEVICE)
 
             images_rotated = []
             labes_rotated = []
 
-            for img in images:
-                rotated_imgs = [
-                    img,
-                    rotate(img, 90),
-                    rotate(img, 180),
-                    rotate(img, 270)
-                ]
-                rotation_labels = torch.LongTensor([0, 1, 2, 3])
-                stack = torch.stack(rotated_imgs, dim=0)
+            # for img in images:
+            #     rotated_imgs = [
+            #         img,
+            #         rotate(img, 90),
+            #         rotate(img, 180),
+            #         rotate(img, 270)
+            #     ]
+            #     rotation_labels = torch.LongTensor([0, 1, 2, 3])
+            #     stack = torch.stack(rotated_imgs, dim=0)
+            #
+            #     images_rotated.append(stack)
+            #     labes_rotated.append(rotation_labels)
+            #
+            # images = torch.cat(images_rotated, dim=0).to(DEVICE)
+            # labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
 
-                images_rotated.append(stack)
-                labes_rotated.append(rotation_labels)
-
-            images = torch.cat(images_rotated, dim=0).to(DEVICE)
-            labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
+            images, labels = create_rotated_images_and_labels(images)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward
             outputs = model(images)
+
             _, preds = torch.max(outputs.data, 1)
             loss = loss_fn(outputs, labels)
 
@@ -238,21 +263,25 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_lo
                 images_rotated = []
                 labes_rotated = []
 
-                for img in images:
-                    rotated_imgs = [
-                        img,
-                        rotate(img, 90),
-                        rotate(img, 180),
-                        rotate(img, 270)
-                    ]
-                    rotation_labels = torch.LongTensor([0, 1, 2, 3])
-                    stack = torch.stack(rotated_imgs, dim=0)
 
-                    images_rotated.append(stack)
-                    labes_rotated.append(rotation_labels)
 
-                images = torch.cat(images_rotated, dim=0).to(DEVICE)
-                labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
+                # for img in images:
+                #     rotated_imgs = [
+                #         img,
+                #         rotate(img, 90),
+                #         rotate(img, 180),
+                #         rotate(img, 270)
+                #     ]
+                #     rotation_labels = torch.LongTensor([0, 1, 2, 3])
+                #     stack = torch.stack(rotated_imgs, dim=0)
+                #
+                #     images_rotated.append(stack)
+                #     labes_rotated.append(rotation_labels)
+                #
+                # images = torch.cat(images_rotated, dim=0).to(DEVICE)
+                # labels = torch.cat(labes_rotated, dim=0).to(DEVICE)
+
+                images, labels = create_rotated_images_and_labels(images)
 
                 # forward
                 outputs = model(images)
