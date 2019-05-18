@@ -70,30 +70,26 @@ def train_autoencoder_deep_fashion():
     return train(encoder, decoder, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
 
 
-def transfer_learning_autoencoder_mnist(encoder, decoder):
+def transfer_learning_autoencoder_mnist(encoder):
     """Fine tunes the autoencoder for Fashion MNIST."""
     print("=============================================================")
     print("=========== Transfer Learning with FashionMNIST =============")
     print("=============================================================\n")
 
-    classifier = CifarNet(input_channels=1, num_classes=10)
-    classifier = classifier.to(DEVICE)
-
     encoder = encoder.to(DEVICE)
-    decoder = decoder.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(list(decoder.parameters())+list(encoder.parameters())+list(classifier.parameters()),
+    optimizer = torch.optim.Adam(list(encoder.parameters()),
                                  lr=LEARNING_RATE_FINE_TUNE,
                                  weight_decay=WEIGHT_DECAY)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
-    return fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE,
+    return fine_tune_autoencoder(encoder, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE,
                                  train_loader_fashion_mnist, val_loader_fashion_mnist)
 
 
@@ -103,53 +99,45 @@ def transfer_learning_autoencoder_deep_fashion(encoder, decoder):
     print("=========== Transfer Learning with DeepFashion ==============")
     print("=============================================================\n")
 
-    classifier = CifarNet(input_channels=3, num_classes=50)
-    classifier = classifier.to(DEVICE)
-
     encoder = encoder.to(DEVICE)
-    decoder = decoder.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(list(decoder.parameters())+list(encoder.parameters())+list(classifier.parameters()),
+    optimizer = torch.optim.Adam(list(decoder.parameters())+list(encoder.parameters()),
                                  lr=LEARNING_RATE_FINE_TUNE,
                                  weight_decay=WEIGHT_DECAY)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
-    return fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE,
+    return fine_tune_autoencoder(encoder, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE,
                                  train_loader_deep_fashion, val_loader_deep_fashion)
 
 
-def test_autoencoder_mnist(encoder, decoder, classifier):
+def test_autoencoder_mnist(encoder):
     """Tests the autoencoder."""
     print("=============================================================")
     print("============== Testing AE with FashionMNIST (new) ===========")
     print("=============================================================\n")
 
     encoder = encoder.to(DEVICE)
-    decoder = decoder.to(DEVICE)
-    classifier = classifier.to(DEVICE)
 
     loss_fn = nn.CrossEntropyLoss()
-    return test_autoencoder(encoder, decoder, classifier, loss_fn, test_loader_fashion_mnist)
+    return test_autoencoder(encoder, loss_fn, test_loader_fashion_mnist)
 
 
-def test_autoencoder_deep_fashion(encoder, decoder, classifier):
+def test_autoencoder_deep_fashion(encoder):
     """Tests the autoencoder."""
     print("=============================================================")
     print("============== Testing AE with FashionMNIST (new) ===========")
     print("=============================================================\n")
 
     encoder = encoder.to(DEVICE)
-    decoder = decoder.to(DEVICE)
-    classifier = classifier.to(DEVICE)
 
     loss_fn = nn.CrossEntropyLoss()
-    return test_autoencoder(encoder, decoder, classifier, loss_fn, test_loader_deep_fashion)
+    return test_autoencoder(encoder, loss_fn, test_loader_deep_fashion)
 
 
 def train(encoder, decoder, loss_fn, optimizer, scheduler, num_epochs, train_loader):
@@ -195,10 +183,10 @@ def train(encoder, decoder, loss_fn, optimizer, scheduler, num_epochs, train_loa
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Average loss: {:4f}'.format(np.mean(train_losses)))
 
-    return encoder, decoder, train_losses
+    return encoder, train_losses
 
 
-def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
+def fine_tune_autoencoder(encoder, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
     """Fine tune the model"""
     # We will monitor loss functions as the training progresses
     train_losses = []
@@ -213,7 +201,6 @@ def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, sche
     for epoch in range(num_epochs):
         scheduler.step()
         encoder.train()
-        decoder.train()
 
         running_loss = []
         running_corrects_train = 0.0
@@ -227,8 +214,6 @@ def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, sche
 
             # forward
             outputs = encoder(images)
-            outputs = decoder(outputs)
-            outputs = classifier(outputs)
 
             _, preds = torch.max(outputs.data, 1)
             loss = loss_fn(outputs, labels)
@@ -245,8 +230,6 @@ def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, sche
         train_accuracies.append(100.0 * running_corrects_train / len(train_loader.dataset))
 
         encoder.eval()
-        decoder.eval()
-        classifier.eval()
         running_corrects_val = 0.0
         running_loss = []
         with torch.no_grad():
@@ -257,8 +240,6 @@ def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, sche
                 # forward
 
                 outputs = encoder(images)
-                outputs = decoder(outputs)
-                outputs = classifier(outputs)
 
                 _, preds = torch.max(outputs.data, 1)
                 loss = loss_fn(outputs, labels)
@@ -285,14 +266,12 @@ def fine_tune_autoencoder(encoder, decoder, classifier, loss_fn, optimizer, sche
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
 
-    return encoder, decoder, classifier, train_losses, val_losses, train_accuracies, val_accuracies
+    return encoder, train_losses, val_losses, train_accuracies, val_accuracies
 
 
-def test_autoencoder(encoder, decoder, classifier, loss_fn, test_loader):
+def test_autoencoder(encoder, loss_fn, test_loader):
     """Tests the model on data from test_loader"""
     encoder.eval()
-    decoder.eval()
-    classifier.eval()
 
     test_loss = 0
     n_correct = 0
@@ -303,12 +282,10 @@ def test_autoencoder(encoder, decoder, classifier, loss_fn, test_loader):
             labels = labels.to(DEVICE)
 
             outputs = encoder(images)
-            outputs = decoder(outputs)
-            output = classifier(outputs)
 
-            loss = loss_fn(output, labels)
+            loss = loss_fn(outputs, labels)
             test_loss += loss.item()
-            n_correct += torch.sum(output.argmax(1) == labels).item()
+            n_correct += torch.sum(outputs.argmax(1) == labels).item()
 
     average_test_loss = test_loss / len(test_loader.dataset)
     average_test_accuracy = 100.0 * n_correct / len(test_loader.dataset)
