@@ -16,3 +16,5 @@ def supervised_deep_fashion():
     average_test_loss_sv_df, average_test_accuracy_sv_df = test_classification_deep_fashion(sv_df_trained)
     plot_summary([train_acc_sv_df, val_acc_sv_df], average_test_accuracy_sv_df, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test Supervised Deep Fashion", axis2="Accuracy")
     plot_summary([train_losses_sv_df, val_losses_sv_df], average_test_loss_sv_df, ["train loss", "val loss", "test loss"], "Loss Test Supvervised Deep Fashion", axis2="Loss")
+
+    return average_test_loss_sv_df, average_test_accuracy_sv_df

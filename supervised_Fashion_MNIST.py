@@ -16,3 +16,5 @@ def supervised_fashion_mnist():
     average_test_loss_sv_mnist, average_test_accuracy_sv_mnist = test_classification_on_supervised_fashionMNIST(sv_mnist_trained)
     plot_summary([train_acc_sv_mnist, val_acc_sv_mnist], average_test_accuracy_sv_mnist, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test Supervised Fashion MNIST", axis2="Accuracy")
     plot_summary([train_losses_sv_mnist, val_losses_sv_mnist], average_test_loss_sv_mnist, ["train loss", "val loss", "test loss"], "Loss Test Supervised Fashion MNIST", axis2="Loss")
+
+    return average_test_loss_sv_mnist, average_test_accuracy_sv_mnist
