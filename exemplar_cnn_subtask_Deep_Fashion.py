@@ -20,5 +20,7 @@ def exemplar_cnn_subtask_deep_fashion():
 
     # test with DeepFashion
     average_test_loss_ex_cnn_df, average_test_accuracy_ex_cnn_df = test_classification_on_exemplar_cnn_deep_fashion(ex_cnn_df_trained_finetuned)
-    plot_summary([train_acc_ex_cnn_df_ft, val_acc_ex_cnn_df_ft], average_test_accuracy_ex_cnn_df, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test ExemplarCNN Deep Fashion", axis2="Accuracy") # TODO: check if it works
-    plot_summary([train_losses_ex_cnn_df_ft, val_loss_ex_cnn_df_ft], average_test_loss_ex_cnn_df, ["train loss", "val loss", "test loss"], "Loss Test ExemplarCNN Deep Fashion", axis2="Loss") # TODO: check if it works
+    plot_summary([train_acc_ex_cnn_df_ft, val_acc_ex_cnn_df_ft], average_test_accuracy_ex_cnn_df, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test ExemplarCNN Deep Fashion", axis2="Accuracy")
+    plot_summary([train_losses_ex_cnn_df_ft, val_loss_ex_cnn_df_ft], average_test_loss_ex_cnn_df, ["train loss", "val loss", "test loss"], "Loss Test ExemplarCNN Deep Fashion", axis2="Loss")
+
+    return average_test_loss_ex_cnn_df, average_test_accuracy_ex_cnn_df

@@ -26,3 +26,4 @@ def autoencoder_subtask_fashion_MNIST():
                  axis2="Accuracy")
     plot_summary([train_losses_ft, val_losses_ft], average_test_loss,
                  ["train loss", "val loss", "test average loss"], "Loss autoencoder FashionMNIST", axis2="Loss")
+    return average_test_loss, average_test_accuracy

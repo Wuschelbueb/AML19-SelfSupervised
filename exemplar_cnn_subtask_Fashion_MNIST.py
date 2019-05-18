@@ -19,5 +19,7 @@ def exemplar_cnn_subtask_fashion_mnist():
 
     # test with FashionMNIST
     average_test_loss_ex_cnn_f, average_test_accuracy_ex_cnn_f = test_classification_on_exemplar_cnn(ex_cnn_f_trained_finetuned)
-    plot_summary([train_acc_ex_cnn_f_ft, val_acc_ex_cnn_f_ft], average_test_accuracy_ex_cnn_f, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test ExemplarCNN Fashion MNIST", axis2="Accuracy") # TODO: check if it works
-    plot_summary([train_losses_ex_cnn_f_ft, val_loss_ex_cnn_f_ft], average_test_loss_ex_cnn_f, ["train loss", "val loss", "test loss"], "Loss Test ExemplarCNN Fashion MNIST", axis2="Loss") # TODO: check if it works
+    plot_summary([train_acc_ex_cnn_f_ft, val_acc_ex_cnn_f_ft], average_test_accuracy_ex_cnn_f, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy Test ExemplarCNN Fashion MNIST", axis2="Accuracy")
+    plot_summary([train_losses_ex_cnn_f_ft, val_loss_ex_cnn_f_ft], average_test_loss_ex_cnn_f, ["train loss", "val loss", "test loss"], "Loss Test ExemplarCNN Fashion MNIST", axis2="Loss")
+
+    return average_test_loss_ex_cnn_f, average_test_accuracy_ex_cnn_f

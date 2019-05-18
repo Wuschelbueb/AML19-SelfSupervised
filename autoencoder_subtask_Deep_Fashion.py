@@ -20,3 +20,5 @@ def autoencoder_subtask_deep_fashion():
     average_test_loss, average_test_accuracy= test_autoencoder_deep_fashion(encoder_ft, decoder_ft, classifier_ft)
     plot_summary([train_acc_ft, val_acc_ft], average_test_accuracy, ["train accuracy", "val accuracy", "test accuracy"], "Accuracy autoencoder FashionMNIST", axis2="Accuracy")
     plot_summary([train_losses_ft, val_losses_ft], average_test_loss, ["train loss", "val loss", "test average loss"], "Loss autoencoder FashionMNIST", axis2="Loss")
+
+    return average_test_loss, average_test_accuracy
