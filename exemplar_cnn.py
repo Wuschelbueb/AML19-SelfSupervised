@@ -208,7 +208,7 @@ def train_exemplar_cnn():
     print("=============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=1, num_classes=train_loader_fashion_mnist.batch_size)
+    exemplar_cnn = CifarNet(input_channels=1, num_classes=len(train_loader_fashion_mnist.dataset))
     exemplar_cnn = exemplar_cnn.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with softmax final layer
@@ -230,7 +230,7 @@ def train_exemplar_cnn_deep_fashion():
     print("============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=3, num_classes=train_loader_deep_fashion.batch_size)
+    exemplar_cnn = CifarNet(input_channels=3, num_classes=len(train_loader_deep_fashion.dataset))
     exemplar_cnn = exemplar_cnn.to(DEVICE)
 
     # Criteria NLLLoss which is recommended with softmax final layer
@@ -341,13 +341,13 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
 
         running_loss = []
         running_corrects = 0
+        len_transformed_imgs = 0.0
 
         for images, labels in train_loader:
             images = images.to(DEVICE)
             images_transformed, labes_transformed = [], []
 
             for index, img in enumerate(images):
-                image_index += image_index
                 transformed_imgs = [
                     img,
                     transform_image(img, 0),
@@ -356,12 +356,21 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
                     transform_image(img, 3),
                     transform_image(img, 4),
                     transform_image(img, 5),
+                    transform_image(img, 3),
+                    transform_image(img, 4),
+                    transform_image(img, 5),
+                    transform_image(img, 1),
+                    transform_image(img, 3),
+                    transform_image(img, 4),
+                    transform_image(img, 5),
                 ]
-                transformed_labels = torch.LongTensor([image_index, image_index, image_index, image_index, image_index, image_index, image_index])
+                len_transformed_imgs = len(transformed_imgs)
+                transformed_labels = torch.LongTensor(np.repeat(image_index, len(transformed_imgs)).tolist())
                 stack = torch.stack(transformed_imgs, dim=0)
 
                 images_transformed.append(stack)
                 labes_transformed.append(transformed_labels)
+                image_index += 1
 
             images = torch.cat(images_transformed, dim=0).to(DEVICE)
             labels = torch.cat(labes_transformed, dim=0).to(DEVICE)
@@ -383,7 +392,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             running_corrects += torch.sum(preds == labels.data).to(torch.float32)
 
         train_losses.append(np.mean(np.array(running_loss)))
-        train_accuracies.append((100.0 * running_corrects) / (7 * len(train_loader.dataset)))
+        train_accuracies.append((100.0 * running_corrects) / (len_transformed_imgs * len(train_loader.dataset)))
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs,
