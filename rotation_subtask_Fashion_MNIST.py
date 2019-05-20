@@ -20,8 +20,8 @@ def rotation_subtask_fashion_mnist():
     # test with FashionMNIST
     average_test_loss, average_test_accuracy = test_classification_on_rotation_model(rotnet_ft)
     plot_summary([train_acc_ft, val_acc_ft], average_test_accuracy, ["train accuracy", "val accuracy", "test accuracy"],
-                 "Accuracy Test Rotation DeepFashion", axis2="Accuracy")
+                 "Accuracy Test Rotation FashionMNIST", axis2="Accuracy")
     plot_summary([train_losses_ft, val_losses_ft], average_test_loss, ["train loss", "val loss", "test loss"],
-                 "Loss Test Rotation DeepFashion", axis2="Loss")
+                 "Loss Test Rotation FashionMNIST", axis2="Loss")
 
     return average_test_loss, average_test_accuracy

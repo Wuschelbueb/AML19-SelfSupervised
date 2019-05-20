@@ -45,20 +45,6 @@ def create_rotated_images_and_labels(images):
     return images, labels
 
 
-def rotate(image, angle):
-    """Rotate the image by the specified angle"""
-    image = image.cpu()
-    image = tf.to_pil_image(image)
-    image = tf.rotate(image, angle)
-    image = tf.to_tensor(image)
-    if image.shape[0] == 3:
-        image = tf.normalize(image, (0.5, 0.5, 0.5,), (0.5, 0.5, 0.5,))
-    else:
-        image = tf.normalize(image, (0.5,), (0.5,))
-    image = image.to(DEVICE)
-    return image
-
-
 def train_rotation_net():
     """Trains the rotation model."""
     print("=============================================================")
