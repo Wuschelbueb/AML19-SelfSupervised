@@ -1,0 +1,49 @@
+=============================================================
+================ Train AE with DeepFashion ==================
+=============================================================
+
+Epoch 1/15: train_loss: 0.1156
+Epoch 2/15: train_loss: 0.0700
+Epoch 3/15: train_loss: 0.0615
+Epoch 4/15: train_loss: 0.0578
+Epoch 5/15: train_loss: 0.0561
+Epoch 6/15: train_loss: 0.0548
+Epoch 7/15: train_loss: 0.0535
+Epoch 8/15: train_loss: 0.0508
+Epoch 9/15: train_loss: 0.0504
+Epoch 10/15: train_loss: 0.0502
+Epoch 11/15: train_loss: 0.0501
+Epoch 12/15: train_loss: 0.0501
+Epoch 13/15: train_loss: 0.0501
+Epoch 14/15: train_loss: 0.0499
+Epoch 15/15: train_loss: 0.0496
+
+Training complete in 43m 39s
+Average loss: 0.058025
+=============================================================
+=========== Transfer Learning with DeepFashion ==============
+=============================================================
+
+Epoch 1/15: train_loss: 2.5748, train_accuracy: 30.1383, val_loss: 2.2682, val_accuracy: 35.6800
+Epoch 2/15: train_loss: 2.2478, train_accuracy: 35.9533, val_loss: 2.1441, val_accuracy: 38.2250
+Epoch 3/15: train_loss: 2.1614, train_accuracy: 37.9900, val_loss: 2.1033, val_accuracy: 38.9400
+Epoch 4/15: train_loss: 2.1037, train_accuracy: 39.0817, val_loss: 2.0707, val_accuracy: 40.4200
+Epoch 5/15: train_loss: 2.0619, train_accuracy: 40.0233, val_loss: 2.0719, val_accuracy: 39.8500
+Epoch 6/15: train_loss: 2.0233, train_accuracy: 40.8633, val_loss: 2.0254, val_accuracy: 41.3200
+Epoch 7/15: train_loss: 1.9962, train_accuracy: 41.6367, val_loss: 2.0299, val_accuracy: 40.8900
+Epoch 8/15: train_loss: 1.8826, train_accuracy: 44.2983, val_loss: 1.9761, val_accuracy: 43.1050
+Epoch 9/15: train_loss: 1.8555, train_accuracy: 44.9950, val_loss: 1.9736, val_accuracy: 42.8700
+Epoch 10/15: train_loss: 1.8400, train_accuracy: 45.3300, val_loss: 1.9726, val_accuracy: 43.0300
+Epoch 11/15: train_loss: 1.8299, train_accuracy: 45.4633, val_loss: 1.9714, val_accuracy: 43.3300
+Epoch 12/15: train_loss: 1.8133, train_accuracy: 45.9433, val_loss: 1.9734, val_accuracy: 43.1850
+Epoch 13/15: train_loss: 1.8074, train_accuracy: 46.1217, val_loss: 1.9745, val_accuracy: 43.4950
+Epoch 14/15: train_loss: 1.7982, train_accuracy: 46.4517, val_loss: 1.9723, val_accuracy: 43.4850
+Epoch 15/15: train_loss: 1.7717, train_accuracy: 47.0367, val_loss: 1.9693, val_accuracy: 43.4400
+
+Training complete in 30m 25s
+Best val Acc: 43.494999
+=============================================================
+============== Testing AE with FashionMNIST (new) ===========
+=============================================================
+
+Test average loss: 0.007868422377109528 accuracy: 42.545

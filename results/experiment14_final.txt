@@ -1,0 +1,27 @@
+============================================================
+============= Supervised Training DeepFashion ==============
+============================================================
+
+Epoch 1/15: train_loss: 2.2486, train_accuracy: 35.9590, val_loss: 2.0985, val_accuracy: 39.4400
+Epoch 2/15: train_loss: 2.0708, train_accuracy: 40.1865, val_loss: 2.0188, val_accuracy: 41.4075
+Epoch 3/15: train_loss: 2.0080, train_accuracy: 41.7605, val_loss: 1.9981, val_accuracy: 41.3900
+Epoch 4/15: train_loss: 1.9674, train_accuracy: 42.7585, val_loss: 1.9537, val_accuracy: 43.1975
+Epoch 5/15: train_loss: 1.9307, train_accuracy: 43.7190, val_loss: 1.9503, val_accuracy: 43.4650
+Epoch 6/15: train_loss: 1.9002, train_accuracy: 44.3810, val_loss: 1.9208, val_accuracy: 44.3275
+Epoch 7/15: train_loss: 1.8745, train_accuracy: 45.0395, val_loss: 1.9150, val_accuracy: 44.2150
+Epoch 8/15: train_loss: 1.7770, train_accuracy: 47.3755, val_loss: 1.8635, val_accuracy: 45.9775
+Epoch 9/15: train_loss: 1.7546, train_accuracy: 48.0495, val_loss: 1.8598, val_accuracy: 46.0650
+Epoch 10/15: train_loss: 1.7436, train_accuracy: 48.2735, val_loss: 1.8617, val_accuracy: 46.2600
+Epoch 11/15: train_loss: 1.7350, train_accuracy: 48.5755, val_loss: 1.8623, val_accuracy: 46.0475
+Epoch 12/15: train_loss: 1.7284, train_accuracy: 48.6815, val_loss: 1.8639, val_accuracy: 45.9150
+Epoch 13/15: train_loss: 1.7212, train_accuracy: 48.8845, val_loss: 1.8601, val_accuracy: 46.1375
+Epoch 14/15: train_loss: 1.7166, train_accuracy: 49.0010, val_loss: 1.8602, val_accuracy: 46.2175
+Epoch 15/15: train_loss: 1.6995, train_accuracy: 49.4490, val_loss: 1.8558, val_accuracy: 46.3725
+
+Training complete in 90m 43s
+Best val Acc: 46.372498
+============================================================
+== Test Classification Supervised Model with DeepFashion ===
+============================================================
+
+Test average loss: 0.007322255700826645 accuracy: 45.7325
