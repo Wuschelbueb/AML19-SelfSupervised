@@ -1,0 +1,49 @@
+=============================================================
+============ Train ExemplarCNN with FashionMNIST ============
+=============================================================
+
+Epoch 1/15: train_loss: 10.4396, train_accuracy: 0.0050
+Epoch 2/15: train_loss: 9.8337, train_accuracy: 0.0117
+Epoch 3/15: train_loss: 9.6255, train_accuracy: 0.0150
+Epoch 4/15: train_loss: 10.2512, train_accuracy: 0.0383
+Epoch 5/15: train_loss: 9.2761, train_accuracy: 0.0533
+Epoch 6/15: train_loss: 9.0723, train_accuracy: 0.0617
+Epoch 7/15: train_loss: 8.9650, train_accuracy: 0.0767
+Epoch 8/15: train_loss: 13.2429, train_accuracy: 0.0000
+Epoch 9/15: train_loss: 10.3398, train_accuracy: 0.0000
+Epoch 10/15: train_loss: 9.7987, train_accuracy: 0.0067
+Epoch 11/15: train_loss: 9.0259, train_accuracy: 0.0233
+Epoch 12/15: train_loss: 8.8847, train_accuracy: 0.0017
+Epoch 13/15: train_loss: 8.8400, train_accuracy: 0.0033
+Epoch 14/15: train_loss: 8.8269, train_accuracy: 0.0133
+Epoch 15/15: train_loss: 8.7225, train_accuracy: 0.0117
+
+Training complete in 5m 34s
+Best accuracy: 0.000000
+=============================================================
+========= Fine Tune Exemplar CNN with FashionMNIST ==========
+=============================================================
+
+Epoch 1/15: train_loss: 1.5711, train_accuracy: 43.2500, val_loss: 1.0895, val_accuracy: 58.9667
+Epoch 2/15: train_loss: 0.9627, train_accuracy: 63.4833, val_loss: 0.8751, val_accuracy: 67.3500
+Epoch 3/15: train_loss: 0.8438, train_accuracy: 68.8167, val_loss: 0.7872, val_accuracy: 70.8667
+Epoch 4/15: train_loss: 0.7633, train_accuracy: 72.3333, val_loss: 0.7630, val_accuracy: 69.5167
+Epoch 5/15: train_loss: 0.6962, train_accuracy: 73.0333, val_loss: 0.6686, val_accuracy: 74.4167
+Epoch 6/15: train_loss: 0.6574, train_accuracy: 74.0000, val_loss: 0.6435, val_accuracy: 75.2167
+Epoch 7/15: train_loss: 0.6190, train_accuracy: 76.3167, val_loss: 0.6344, val_accuracy: 76.1667
+Epoch 8/15: train_loss: 0.5742, train_accuracy: 77.7500, val_loss: 0.5983, val_accuracy: 77.2500
+Epoch 9/15: train_loss: 0.5643, train_accuracy: 78.2333, val_loss: 0.5876, val_accuracy: 78.1667
+Epoch 10/15: train_loss: 0.5581, train_accuracy: 78.4000, val_loss: 0.5870, val_accuracy: 77.9500
+Epoch 11/15: train_loss: 0.5519, train_accuracy: 78.5833, val_loss: 0.5827, val_accuracy: 78.1667
+Epoch 12/15: train_loss: 0.5467, train_accuracy: 78.7667, val_loss: 0.5832, val_accuracy: 78.1500
+Epoch 13/15: train_loss: 0.5477, train_accuracy: 78.2667, val_loss: 0.5819, val_accuracy: 78.1000
+Epoch 14/15: train_loss: 0.5439, train_accuracy: 78.8500, val_loss: 0.5769, val_accuracy: 78.6833
+Epoch 15/15: train_loss: 0.5429, train_accuracy: 78.6833, val_loss: 0.5770, val_accuracy: 78.3167
+
+Training complete in 1m 4s
+Best val Acc: 78.683334
+=============================================================
+=== Test Classification on Exemplar CNN with FashionMNIST ===
+=============================================================
+
+Test average loss: 0.0023188520789146423 accuracy: 77.97
