@@ -9,16 +9,14 @@ from settings import DEVICE
 
 def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, val_loader):
     """Fine tune the model"""
-    # We will monitor loss functions as the training progresses
-    train_losses = []
-    val_losses = []
-    train_accuracies = []
-    val_accuracies = []
+
+    since = time.time()
+
+    train_losses, val_losses = [], []
+    train_accuracies, val_accuracies = [], []
 
     best_model_wts = model.state_dict()
     best_acc = 0.0
-
-    since = time.time()
 
     for epoch in range(num_epochs):
         scheduler.step()
@@ -72,6 +70,7 @@ def fine_tune(model, loss_fn, optimizer, scheduler, num_epochs, train_loader, va
 
         if val_accuracies[-1] > best_acc:
             best_acc = val_accuracies[-1]
+            best_model_wts = model.state_dict()
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}, val_loss: {:.4f}, val_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs,

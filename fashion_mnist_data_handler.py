@@ -22,8 +22,7 @@ def test_data():
 
 def train_loader_fashion_mnist():
     """Creates the data loader for the train data."""
-    # train_subset, _ = train_val_subset(0.7) # TODO: use this if not training exemplar cnn
-    train_subset, _, _ = train_val_subset_exemplar_cnn()
+    train_subset, _ = train_val_subset(0.7)
 
     train_set = FashionMNISTDataset(
         data=train_subset,
@@ -35,8 +34,7 @@ def train_loader_fashion_mnist():
 
 def val_loader_fashion_mnist():
     """Creates the data loader for the validation data."""
-    # _, val_subset = train_val_subset(0.7) # TODO: use this if not training exemplar cnn
-    _, val_subset, _ = train_val_subset_exemplar_cnn()
+    _, val_subset = train_val_subset(0.7)
 
     val_set = FashionMNISTDataset(
         data=val_subset,
@@ -58,14 +56,3 @@ def train_val_subset(split):
     nbr_val_examples = len(data_set) - nbr_train_examples
 
     return random_split(data_set, [nbr_train_examples, nbr_val_examples])
-
-
-def train_val_subset_exemplar_cnn():
-    """Splits the train data in train and validation subsets."""
-    data_set = train_data()
-    nbr_train_examples = int(len(data_set) * 0.1)
-    nbr_val_examples = int(len(data_set) * 0.1)
-    nbr_unused_examples = int(len(data_set) * 0.8)
-
-    return random_split(data_set, [nbr_train_examples, nbr_val_examples, nbr_unused_examples])
-

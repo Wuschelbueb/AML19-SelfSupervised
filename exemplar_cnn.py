@@ -66,8 +66,7 @@ def horizontal_flip(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -92,8 +91,7 @@ def random_crop(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -118,8 +116,7 @@ def color_jitter(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -144,8 +141,7 @@ def random_resized_crop(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -170,8 +166,7 @@ def random_rotation(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -196,8 +191,7 @@ def random_affine_transformation(image):
         img = transform(image)
     if image.mode == 'RGB':
         img = transform_deepfashion(image)
-    if torch.cuda.is_available():
-        img = img.cuda()
+    img = img.to(DEVICE)
     return img
 
 
@@ -208,19 +202,19 @@ def train_exemplar_cnn():
     print("=============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=1, num_classes=len(train_loader_fashion_mnist.dataset))
-    exemplar_cnn = exemplar_cnn.to(DEVICE)
+    model = CifarNet(input_channels=1, num_classes=len(train_loader_fashion_mnist.dataset))
+    model = model.to(DEVICE)
 
-    # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_TRAIN)
 
-    # Decay LR by a factor of 0.1
+    # Decay LR by a factor of GAMMA
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist)
 
 
 def train_exemplar_cnn_deep_fashion():
@@ -230,19 +224,19 @@ def train_exemplar_cnn_deep_fashion():
     print("============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=3, num_classes=len(train_loader_deep_fashion.dataset))
-    exemplar_cnn = exemplar_cnn.to(DEVICE)
+    model = CifarNet(input_channels=3, num_classes=len(train_loader_deep_fashion.dataset))
+    model = model.to(DEVICE)
 
-    # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=LEARNING_RATE_TRAIN)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_TRAIN)
 
-    # Decay LR by a factor of 0.1 every 4 epochs
+    # Decay LR by a factor of GAMMA
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
 
 
 def fine_tune_exemplar_cnn(model):
@@ -251,28 +245,30 @@ def fine_tune_exemplar_cnn(model):
     print("========= Fine Tune Exemplar CNN with FashionMNIST ==========")
     print("=============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
+    # Use this to train only the last fully connected layer
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
     # add fully connected layer and final layer with 10 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 10, bias=True)
                               )
 
-    # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE_FINE_TUNE, weight_decay=WEIGHT_DECAY)
+    loss_fn = nn.CrossEntropyLoss()
 
-    # Decay LR by a factor of 0.1
+    # Observe that all parameters are being optimized
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_FINE_TUNE, weight_decay=WEIGHT_DECAY)
+
+    # Decay LR by a factor of GAMMA
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_fashion_mnist, val_loader_fashion_mnist)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_fashion_mnist,
+                     val_loader_fashion_mnist)
 
 
 def fine_tune_exemplar_cnn_deep_fashion(model):
@@ -281,28 +277,30 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
     print("========= Fine Tune Exemplar CNN with DeepFashion ==========")
     print("============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
+    # Use this to train only the last fully connected layer
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
-
-    # add fully connected layer and final layer with 10 outputs
+    # add fully connected layer and final layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 50, bias=True)
                               )
 
+    loss_fn = nn.CrossEntropyLoss()
+
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE_FINE_TUNE)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_FINE_TUNE)
 
     # Decay LR by a factor of 0.1 every 4 epochs
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_deep_fashion, val_loader_deep_fashion)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_deep_fashion,
+                     val_loader_deep_fashion)
 
 
 def test_classification_on_exemplar_cnn(model):
@@ -330,10 +328,9 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
     """Train the model"""
 
+    since = time.time()
     train_losses, train_accuracies = [], []
     best_acc = 0.0
-    image_index = 0
-    since = time.time()
 
     for epoch in range(num_epochs):
         scheduler.step()
@@ -342,6 +339,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
         running_loss = []
         running_corrects = 0
         len_transformed_imgs = 0.0
+        image_index = 0
 
         for images, labels in train_loader:
             images = images.to(DEVICE)

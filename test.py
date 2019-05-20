@@ -19,7 +19,7 @@ def test(model, loss_fn, test_loader):
             test_loss += loss.item()
             n_correct += torch.sum(output.argmax(1) == labels).item()
 
-    average_test_loss = test_loss / len(test_loader.dataset)
+    average_test_loss = float(test_loss) / len(test_loader.dataset)
     average_test_accuracy = 100.0 * n_correct / len(test_loader.dataset)
 
     print('Test average loss:', average_test_loss, 'accuracy:', average_test_accuracy)
