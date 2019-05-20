@@ -12,7 +12,8 @@ from cifar_net import CifarNet
 from deep_fashion_data_handler import train_loader_deep_fashion, val_loader_deep_fashion, test_loader_deep_fashion
 from fashion_mnist_data_handler import train_loader_fashion_mnist, val_loader_fashion_mnist, test_loader_fashion_mnist
 from fine_tune import fine_tune
-from settings import DEVICE, EPOCHS
+from settings import DEVICE, EPOCHS, LEARNING_RATE_TRAIN, WEIGHT_DECAY, STEP_SIZE_TRAIN, GAMMA, LEARNING_RATE_FINE_TUNE, \
+    STEP_SIZE_FINE_TUNE, EPOCHS_FINE_TUNE
 from test import test
 
 train_loader_fashion_mnist = train_loader_fashion_mnist()
@@ -52,7 +53,20 @@ def horizontal_flip(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomHorizontalFlip(p=1.0),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5,0.5,0.5), std=(0.5,0.5,0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -64,7 +78,20 @@ def random_crop(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomCrop((20, 20)),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -76,7 +103,20 @@ def color_jitter(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.02),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -88,7 +128,20 @@ def random_resized_crop(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomResizedCrop(40, scale=(0.2, 1.0), ratio=(0.75, 1.333)),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -100,7 +153,20 @@ def random_rotation(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomRotation(45),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -112,7 +178,20 @@ def random_affine_transformation(image):
         ToTensor(),
         Normalize(mean=(0.5,), std=(0.5,))
     ])
-    img = transform(image)
+
+    transform_deepfashion = Compose([
+        RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.8, 1.3), shear=10),
+        Resize(32),
+        ToTensor(),
+        Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ])
+
+    img = None
+    if image.mode == 'L':
+        img = transform(image)
+    if image.mode == 'RGB':
+        img = transform_deepfashion(image)
+    img = img.to(DEVICE)
     return img
 
 
@@ -123,19 +202,19 @@ def train_exemplar_cnn():
     print("=============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=1, num_classes=train_loader_fashion_mnist.batch_size)
-    exemplar_cnn = exemplar_cnn.to(DEVICE)
+    model = CifarNet(input_channels=1, num_classes=len(train_loader_fashion_mnist.dataset))
+    model = model.to(DEVICE)
 
-    # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=0.001)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_TRAIN)
 
-    # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+    # Decay LR by a factor of GAMMA
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist)
 
 
 def train_exemplar_cnn_deep_fashion():
@@ -145,19 +224,19 @@ def train_exemplar_cnn_deep_fashion():
     print("============================================================\n")
 
     # number of predicted classes = number of training images
-    exemplar_cnn = CifarNet(input_channels=3, num_classes=train_loader_deep_fashion.batch_size)
-    exemplar_cnn = exemplar_cnn.to(DEVICE)
+    model = CifarNet(input_channels=3, num_classes=len(train_loader_deep_fashion.dataset))
+    model = model.to(DEVICE)
 
-    # Criteria NLLLoss which is recommended with softmax final layer
     loss_fn = nn.CrossEntropyLoss()
 
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(exemplar_cnn.parameters(), lr=0.001)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_TRAIN)
 
-    # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+    # Decay LR by a factor of GAMMA
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_TRAIN, gamma=GAMMA)
 
-    return train(exemplar_cnn, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
+    return train(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion)
 
 
 def fine_tune_exemplar_cnn(model):
@@ -166,28 +245,30 @@ def fine_tune_exemplar_cnn(model):
     print("========= Fine Tune Exemplar CNN with FashionMNIST ==========")
     print("=============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
+    # Use this to train only the last fully connected layer
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
     # add fully connected layer and final layer with 10 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 10, bias=True)
                               )
 
-    # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    loss_fn = nn.CrossEntropyLoss()
 
-    # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+    # Observe that all parameters are being optimized
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_FINE_TUNE, weight_decay=WEIGHT_DECAY)
+
+    # Decay LR by a factor of GAMMA
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_fashion_mnist, val_loader_fashion_mnist)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_fashion_mnist,
+                     val_loader_fashion_mnist)
 
 
 def fine_tune_exemplar_cnn_deep_fashion(model):
@@ -196,28 +277,30 @@ def fine_tune_exemplar_cnn_deep_fashion(model):
     print("========= Fine Tune Exemplar CNN with DeepFashion ==========")
     print("============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
-    loss_fn = nn.CrossEntropyLoss()
+    # Use this to train only the last fully connected layer
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    #
+    # for param in model.fc3.parameters():
+    #     param.requires_grad = True
 
-    for param in model.parameters():
-        param.requires_grad = False
-
-    for param in model.fc3.parameters():
-        param.requires_grad = True
-
-    # add fully connected layer and final layer with 10 outputs
+    # add fully connected layer and final layer with 50 outputs
     model.fc3 = nn.Sequential(nn.Linear(192, 192),
                               nn.Linear(192, 50, bias=True)
                               )
 
+    loss_fn = nn.CrossEntropyLoss()
+
     # Observe that all parameters are being optimized
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    parameters = model.parameters()
+    optimizer = torch.optim.Adam(parameters, lr=LEARNING_RATE_FINE_TUNE)
 
     # Decay LR by a factor of 0.1 every 4 epochs
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=4, gamma=0.1)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=STEP_SIZE_FINE_TUNE, gamma=GAMMA)
 
     model = model.to(DEVICE)
-    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS, train_loader_deep_fashion, val_loader_deep_fashion)
+    return fine_tune(model, loss_fn, optimizer, scheduler, EPOCHS_FINE_TUNE, train_loader_deep_fashion,
+                     val_loader_deep_fashion)
 
 
 def test_classification_on_exemplar_cnn(model):
@@ -226,16 +309,9 @@ def test_classification_on_exemplar_cnn(model):
     print("=== Test Classification on Exemplar CNN with FashionMNIST ===")
     print("=============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 10, bias=True)
-                              )
-
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_fashion_mnist)
+    return test(model, loss_fn, test_loader_fashion_mnist)
 
 
 def test_classification_on_exemplar_cnn_deep_fashion(model):
@@ -244,28 +320,17 @@ def test_classification_on_exemplar_cnn_deep_fashion(model):
     print("=== Test Classification on Exemplar CNN with DeepFashion ===")
     print("============================================================\n")
 
-    # Criteria NLLLoss which is recommended with Softmax final layer
     loss_fn = nn.CrossEntropyLoss()
-
-    # replace fc layer with 10 outputs
-    model.fc3 = nn.Sequential(nn.Linear(192, 192),
-                              nn.Linear(192, 50, bias=True)
-                              )
-
     model = model.to(DEVICE)
-    return test(model, loss_fn, EPOCHS, test_loader_deep_fashion)
+    return test(model, loss_fn, test_loader_deep_fashion)
 
 
 def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
     """Train the model"""
 
-    train_losses = []
-    train_accuracies = []
-
-    best_model_wts = model.state_dict()
-    best_acc = 0.0
-
     since = time.time()
+    train_losses, train_accuracies = [], []
+    best_acc = 0.0
 
     for epoch in range(num_epochs):
         scheduler.step()
@@ -273,28 +338,37 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
 
         running_loss = []
         running_corrects = 0
+        len_transformed_imgs = 0.0
+        image_index = 0
 
         for images, labels in train_loader:
             images = images.to(DEVICE)
-            labels = labels.to(DEVICE)
-
-            images_transformed = []
-            labes_transformed = []
+            images_transformed, labes_transformed = [], []
 
             for index, img in enumerate(images):
                 transformed_imgs = [
+                    img,
                     transform_image(img, 0),
                     transform_image(img, 1),
                     transform_image(img, 2),
                     transform_image(img, 3),
                     transform_image(img, 4),
                     transform_image(img, 5),
+                    transform_image(img, 3),
+                    transform_image(img, 4),
+                    transform_image(img, 5),
+                    transform_image(img, 1),
+                    transform_image(img, 3),
+                    transform_image(img, 4),
+                    transform_image(img, 5),
                 ]
-                transformed_labels = torch.LongTensor([index, index, index, index, index, index])
+                len_transformed_imgs = len(transformed_imgs)
+                transformed_labels = torch.LongTensor(np.repeat(image_index, len(transformed_imgs)).tolist())
                 stack = torch.stack(transformed_imgs, dim=0)
 
                 images_transformed.append(stack)
                 labes_transformed.append(transformed_labels)
+                image_index += 1
 
             images = torch.cat(images_transformed, dim=0).to(DEVICE)
             labels = torch.cat(labes_transformed, dim=0).to(DEVICE)
@@ -305,9 +379,6 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             # forward
             outputs = model(images)
             _, preds = torch.max(outputs.data, 1)
-
-            # print("outputs shape", outputs.shape)
-
             loss = loss_fn(outputs, labels)
 
             # backward + optimize only if in training phase
@@ -319,12 +390,7 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             running_corrects += torch.sum(preds == labels.data).to(torch.float32)
 
         train_losses.append(np.mean(np.array(running_loss)))
-        train_accuracies.append((100.0 * running_corrects) / (6 * len(train_loader.dataset)))
-
-        # deep copy the model
-        if train_accuracies[-1] > best_acc:
-            best_acc = train_accuracies[-1]
-            best_model_wts = model.state_dict()
+        train_accuracies.append((100.0 * running_corrects) / (len_transformed_imgs * len(train_loader.dataset)))
 
         print('Epoch {}/{}: train_loss: {:.4f}, train_accuracy: {:.4f}'.format(
             epoch + 1, num_epochs,
@@ -332,7 +398,6 @@ def train(model, loss_fn, optimizer, scheduler, num_epochs, train_loader):
             train_accuracies[-1]))
 
     time_elapsed = time.time() - since
-    model.load_state_dict(best_model_wts)  # load best model weights
 
     print('\nTraining complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best accuracy: {:4f}'.format(best_acc))
