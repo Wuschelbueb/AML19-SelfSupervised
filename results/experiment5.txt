@@ -1,0 +1,50 @@
+=============================================================
+========== Train Rotation Model with FashionMNIST ===========
+=============================================================
+
+Epoch 1/15: train_loss: 329.7050, train_accuracy: 54.6792, val_loss: 0.7672, val_accuracy: 70.0000
+Epoch 2/15: train_loss: 0.7113, train_accuracy: 73.1196, val_loss: 0.6441, val_accuracy: 77.1903
+Epoch 3/15: train_loss: 0.6198, train_accuracy: 77.4018, val_loss: 0.5502, val_accuracy: 80.0264
+Epoch 4/15: train_loss: 0.5596, train_accuracy: 79.9536, val_loss: 0.5422, val_accuracy: 80.8333
+Epoch 5/15: train_loss: 0.5237, train_accuracy: 81.3042, val_loss: 0.4761, val_accuracy: 83.3722
+Epoch 6/15: train_loss: 0.5016, train_accuracy: 82.3286, val_loss: 0.6751, val_accuracy: 73.8806
+Epoch 7/15: train_loss: 0.4883, train_accuracy: 82.8875, val_loss: 0.4695, val_accuracy: 83.3264
+Epoch 8/15: train_loss: 0.4403, train_accuracy: 84.6107, val_loss: 0.4157, val_accuracy: 85.6528
+Epoch 9/15: train_loss: 0.4290, train_accuracy: 85.0363, val_loss: 0.4111, val_accuracy: 85.7875
+Epoch 10/15: train_loss: 0.4252, train_accuracy: 85.2190, val_loss: 0.4069, val_accuracy: 85.9819
+Epoch 11/15: train_loss: 0.4199, train_accuracy: 85.4655, val_loss: 0.4045, val_accuracy: 86.0056
+Epoch 12/15: train_loss: 0.4155, train_accuracy: 85.5054, val_loss: 0.3991, val_accuracy: 86.2028
+Epoch 13/15: train_loss: 0.4107, train_accuracy: 85.6750, val_loss: 0.3948, val_accuracy: 86.3042
+Epoch 14/15: train_loss: 0.4088, train_accuracy: 85.8476, val_loss: 0.3907, val_accuracy: 86.5458
+Epoch 15/15: train_loss: 0.4019, train_accuracy: 86.0917, val_loss: 0.3872, val_accuracy: 86.6236
+
+Training complete in 165m 11s
+Best val Acc: 86.623611
+=============================================================
+======== Fine Tune Rotation Model with FashionMNIST =========
+=============================================================
+
+Epoch 1/15: train_loss: 422.3323, train_accuracy: 50.7714, val_loss: 1.2454, val_accuracy: 71.1111
+Epoch 2/15: train_loss: 1.2288, train_accuracy: 66.9714, val_loss: 1.3716, val_accuracy: 60.3667
+Epoch 3/15: train_loss: 0.9613, train_accuracy: 69.2119, val_loss: 0.8769, val_accuracy: 69.2000
+Epoch 4/15: train_loss: 0.8032, train_accuracy: 71.8429, val_loss: 0.7609, val_accuracy: 73.3111
+Epoch 5/15: train_loss: 0.7634, train_accuracy: 72.7095, val_loss: 0.8119, val_accuracy: 70.6889
+Epoch 6/15: train_loss: 0.7154, train_accuracy: 74.1214, val_loss: 0.7970, val_accuracy: 71.8278
+Epoch 7/15: train_loss: 0.7080, train_accuracy: 74.2309, val_loss: 0.6449, val_accuracy: 75.9889
+Epoch 8/15: train_loss: 0.5947, train_accuracy: 78.0119, val_loss: 0.5602, val_accuracy: 79.2778
+Epoch 9/15: train_loss: 0.5773, train_accuracy: 78.5357, val_loss: 0.5508, val_accuracy: 79.5000
+Epoch 10/15: train_loss: 0.5726, train_accuracy: 78.9429, val_loss: 0.5485, val_accuracy: 79.7278
+Epoch 11/15: train_loss: 0.5717, train_accuracy: 78.8810, val_loss: 0.5431, val_accuracy: 80.0444
+Epoch 12/15: train_loss: 0.5702, train_accuracy: 78.8381, val_loss: 0.5451, val_accuracy: 79.6611
+Epoch 13/15: train_loss: 0.5591, train_accuracy: 79.3000, val_loss: 0.5468, val_accuracy: 79.5111
+Epoch 14/15: train_loss: 0.5590, train_accuracy: 79.2548, val_loss: 0.5310, val_accuracy: 80.4667
+Epoch 15/15: train_loss: 0.5447, train_accuracy: 79.7905, val_loss: 0.5275, val_accuracy: 80.4778
+
+Training complete in 42m 26s
+Best val Acc: 80.477776
+=============================================================
+== Test Classification on Rotation Model with FashionMNIST ==
+=============================================================
+
+Test average loss: 0.0021720426976680756 accuracy: 79.68
+Test average loss rotation - Fashion MNIST: 0.0021720426976680756 Test accuracy rotation - Fashion MNIST: 79.68

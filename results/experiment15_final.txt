@@ -1,0 +1,30 @@
+=============================================================
+============= Supervised Training FashionMNIST ==============
+=============================================================
+
+Epoch 1/15: train_loss: 1.2791, train_accuracy: 71.5976, val_loss: 0.5149, val_accuracy: 81.4944
+Epoch 2/15: train_loss: 0.4838, train_accuracy: 83.0595, val_loss: 0.4477, val_accuracy: 84.4000
+Epoch 3/15: train_loss: 0.4284, train_accuracy: 85.1762, val_loss: 0.3896, val_accuracy: 86.0167
+Epoch 4/15: train_loss: 0.3861, train_accuracy: 86.5190, val_loss: 0.3937, val_accuracy: 85.6167
+Epoch 5/15: train_loss: 0.3614, train_accuracy: 87.4190, val_loss: 0.3346, val_accuracy: 88.2500
+Epoch 6/15: train_loss: 0.3421, train_accuracy: 88.1976, val_loss: 0.3991, val_accuracy: 88.1444
+Epoch 7/15: train_loss: 0.3285, train_accuracy: 88.5310, val_loss: 0.3431, val_accuracy: 87.6278
+Epoch 8/15: train_loss: 0.2541, train_accuracy: 90.9500, val_loss: 0.2429, val_accuracy: 91.5222
+Epoch 9/15: train_loss: 0.2354, train_accuracy: 91.5405, val_loss: 0.2378, val_accuracy: 91.7278
+Epoch 10/15: train_loss: 0.2252, train_accuracy: 92.0857, val_loss: 0.2318, val_accuracy: 92.0833
+Epoch 11/15: train_loss: 0.2196, train_accuracy: 92.1738, val_loss: 0.2283, val_accuracy: 92.1444
+Epoch 12/15: train_loss: 0.2192, train_accuracy: 92.3167, val_loss: 0.2221, val_accuracy: 92.3000
+Epoch 13/15: train_loss: 0.2089, train_accuracy: 92.5214, val_loss: 0.2245, val_accuracy: 92.1944
+Epoch 14/15: train_loss: 0.2025, train_accuracy: 92.6667, val_loss: 0.2140, val_accuracy: 92.6611
+Epoch 15/15: train_loss: 0.1875, train_accuracy: 93.3571, val_loss: 0.2068, val_accuracy: 92.9500
+
+Training complete in 5m 21s
+Best val Acc: 92.950005
+=============================================================
+== Test Classification Supervised Model with FashionMNIST ===
+=============================================================
+
+Test average loss: 0.001185642060637474 accuracy: 89.67
+Test average loss AE - Fashion MNIST: 0.4466966869354248 Test accuracy AE - Fashion MNIST: 67.7
+Test average loss rotation - Fashion MNIST: 0.0011856729477643967 Test accuracy rotation - Fashion MNIST: 89.89
+Test average loss supervised - Fashion MNIST: 0.001185642060637474 Test accuracy supervised - Fashion MNIST: 89.67
