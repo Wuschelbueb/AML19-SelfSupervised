@@ -45,7 +45,7 @@ Here are the results of the different methods for the different subtasks:
 | Supervised | Fashion MNIST | 15 | 0.001 | 15 | 0.0001 | 93.76 | **90.33** |
 |---|---|---|---|---|---|---|---|
 | Auto-encoder | Deep Fashion (2)  | 15 | 0.01 | 15 | 0.001 | 43.50 | 42.55 |
-| Exemplar CNN | Deep Fashion | 15 | 0.01 | 15 | 0.01 | 26.28| 25.62 |
+| Exemplar CNN | Deep Fashion (2) | 15 | 0.01 | 15 | 0.01 | 26.28| 25.62 |
 | Rotation Prediction | Deep Fashion (2) | 15 | 0.001 | 15 | 0.001 | 42.93 | 42.75 |
 | Supervised | Deep Fashion (3) | 15 | 0.001 | 15 | 0.001 | 46.37 | **45.73** |
 
@@ -55,8 +55,7 @@ Notes about the experiments:
 
 (1) The Exemplar CNN subtask was trained only with 6'000 images of the FashionMNIST dataset. 
 
-(2) The Auto-encoder and Rotation Prediction subtasks only used a subset of the DeepFashion dataset: 60'000 train images and 20'000 images each for the validation and test 
-set. 
+(2) The Auto-encoder, ExemplarCNN and Rotation Prediction subtasks only used a subset of the DeepFashion dataset: 60'000 train images and 20'000 images each for the validation and test set.  
 
 (3) For supervised learning, we used almost the complete DeepFashion dataset: 200'000 images for training, 40'000 images each for the validation and test set.
 
